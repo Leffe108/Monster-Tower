@@ -312,6 +312,10 @@ function RebuildBuildNewOverlay(room_def) {
 				if (CanBuildRoomHere(room_def.id, x, floor_num)) {
 					var screen_pos = MapToScreen(x, floor_num);
 
+					// Don't add build overlays ontop of toolbar. Cause problems for users
+					// not aware that they can use tab to select the toolbar button overlay.
+					if (screen_pos[1] < 32) continue;
+
 					var overlay_data = {
 						room_def: room_def,
 						floor: floor_num,
@@ -337,6 +341,10 @@ function RebuildNavOverlay(room_def) {
 			for (var i = 0; i < floor_data.length; i++) {
 				var room_data = floor_data[i];
 				var screen_pos = MapToScreen(room_data.x, floor_num);
+
+				// Don't add nav overlays ontop of toolbar. Cause problems for users
+				// not aware that they can use tab to select the toolbar button overlay.
+				if (screen_pos[1] < 32) continue;
 
 				AddOverlayItemForRoom(room_data);
 			}
