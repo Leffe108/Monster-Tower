@@ -285,18 +285,23 @@ function RebuildNavOverlay(room_def) {
 	$('#gui-nav-overlay').find('ul[data-nav-type=room]').find('li').remove();
 
 	for (var floor_num = MIN_FLOOR; floor_num <= MAX_FLOOR; floor_num++) {
-		if (floor_num in g_room_floors) {
-			floor_data = g_room_floors[floor_num];
+		var floor_containers = [g_room_floors, g_stair_floors];
+		for (var i_fc = 0; i_fc < floor_containers.length; i_fc++) {
+			var floor_container = floor_containers[i_fc];
 
-			for (var i = 0; i < floor_data.length; i++) {
-				var room_data = floor_data[i];
-				var screen_pos = MapToScreen(room_data.x, floor_num);
+			if (floor_num in floor_container) {
+				floor_data = floor_container[floor_num];
 
-				// Don't add nav overlays ontop of toolbar. Cause problems for users
-				// not aware that they can use tab to select the toolbar button overlay.
-				if (screen_pos[1] < 32) continue;
+				for (var i = 0; i < floor_data.length; i++) {
+					var room_data = floor_data[i];
+					var screen_pos = MapToScreen(room_data.x, floor_num);
 
-				AddOverlayItemForRoom(room_data);
+					// Don't add nav overlays ontop of toolbar. Cause problems for users
+					// not aware that they can use tab to select the toolbar button overlay.
+					if (screen_pos[1] < 32) continue;
+
+					AddOverlayItemForRoom(room_data);
+				}
 			}
 		}
 	}
