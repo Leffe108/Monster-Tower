@@ -278,7 +278,7 @@ function RebuildBuildNewOverlay(room_def) {
 /** Rebuilds the nav overlay except for toolbars, use RebuildToolbars for that. */
 function RebuildNavOverlay(room_def) {
 
-	$('#gui-nav-overlay').find('ul[data-nav-type=build_new]').find('li').remove();
+	$('#gui-nav-overlay').find('ul[data-nav-type=room]').find('li').remove();
 
 	for (var floor_num = MIN_FLOOR; floor_num <= MAX_FLOOR; floor_num++) {
 		if (floor_num in g_room_floors) {
