@@ -1481,7 +1481,7 @@ var STAR3_MIN_CAFETERIA = 2;
 var STAR3_MIN_FLOWER_SHOP = 3;
 var STAR3_MIN_FLOORS = 20;
 
-var WIN_GAME_MIN_FLOORS = 50;
+var WIN_GAME_MIN_FLOORS = 5;
 
 
 /**
@@ -1516,7 +1516,7 @@ function UpdateGameLevel(time) {
 
 	if (g_game_win_lose > GWL_GAME_OVER) {
 		if (GetBuildingHeight() >= WIN_GAME_MIN_FLOORS) {
-			g_game_level = GWL_WON;
+			g_game_win_lose = GWL_WON;
 		}
 	}
 
