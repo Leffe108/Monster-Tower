@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<!--
+
+	Monster Tower was written for Ludum Dare 33.
+
+	Engine/framework: 
+		- main.js, gui.js, helper.js, index.html and style.css from Intelligent Homes, https://github.com/Leffe108/Intelligent-Homes
+		- Audio playback from Navennni was referenced, https://github.com/Leffe108/Navennni
+		
+	Main tools used:
+		- gvim
+		- Inkscape
+		- Chrome
+		- static-livereload
+
+	License: GPL v2
+	Author: Leif Linse (leffe108 on GitHub)
+
+  -->
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Monster Tower</title>
+
+		<!-- description -->
+		<meta name="description" content="A SimTower clone made for Ludum Dare 33" />
+
+		<!-- icon -->
+		<link rel="apple-touch-icon" href="http://junctioneer.net/monster-tower/images/favicon.png">
+		<meta name="msapplication-TileImage" content="http://junctioneer.net/monster-tower/images/favicon.png">
+		<meta name="msapplication-TileColor" content="#5dc85b">
+		<link rel="icon" type="image/png" href="http://junctioneer.net/monster-tower/images/favicon.png">
+		<link rel="logo" type="image/svg" href="http://junctioneer.net/monster-tower/images/favicon.svg"/>
+		<!--[if IE]><link rel="shortcut icon" href="http://junctioneer.net/monster-tower/images/favicon.ico"><![endif]-->
+
+		<!-- css -->
+		<link rel="stylesheet" type="text/css" href="css/style.css" media="all" />
+	</head>
+	<body>
+		<script src="js/jquery-1.11.3.min.js"></script>
+		<div id="game" role="main">
+			<div id="gui-nav-overlay" class="hidden">
+				<ul data-nav-type="toolbar"></ul>
+				<ul data-nav-type="room"></ul>
+			</div>
+			<div id="gui-build-new-overlay" class="hidden">
+				<ul data-nav-type="toolbar"></ul>
+				<ul data-nav-type="build_new"></ul>
+			</div>
+			<div id="gui-window-overlay" class="hidden" aria-live="polite"></div>
+			<div id="gui-game-over-overlay" class="hidden"></div>
+		</div>
+
+		<!-- Sound effects -->
+		<audio id="sound-effect-build">
+			<source src="audio/build.ogg" type="audio/ogg">
+		</audio>
+		<audio id="sound-effect-new-star">
+			<source src="audio/new-star.ogg" type="audio/ogg">
+		</audio>
+
+		<!-- Individual JS files -->
+		<!--
+		<script src="js/helper.js"></script>
+		<script src="js/gui.js"></script>
+		<script src="js/audio.js"></script>
+		<script src="js/money.js"></script>
+		<script src="js/rooms.js"></script>
+		<script src="js/building.js"></script>
+		<script src="js/game_level.js"></script>
+		<script src="js/main.js"></script>
+		-->
+
+		<!-- Combined JS bundle file -->
+		<script src="js/bundle.min.js"></script>
+	</body>
+</html>
+

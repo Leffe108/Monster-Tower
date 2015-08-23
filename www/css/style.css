@@ -1,0 +1,157 @@
+/* --- Top container of the game --- */
+#game {
+	position: absolute;
+	width: 640px;
+	height: 480px;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	margin: auto;
+}
+
+/* --- Canvas --- */
+#canvas {
+	position: absolute;
+	width: 640px;
+	height: 480px;
+	top: 0;
+	left: 0;
+	z-index: 1;
+}
+
+/* --- GUI --- */
+#gui-window-overlay, #gui-nav-overlay, #gui-build-new-overlay, #gui-game-over-overlay {
+	position: absolute;
+	width: 640px;
+	height: 480px;
+	top: 0;
+	left: 0;
+}
+#gui-nav-overlay, #gui-build-new-overlay, #gui-game-over-overlay {
+	z-index: 2;
+}
+#gui-window-overlay {
+	z-index: 3;
+}
+
+/* Nav overlay */
+#gui-nav-overlay ul, #gui-nav-overlay li,
+#gui-build-new-overlay ul, #gui-build-new-overlay li {
+	list-style-type: none;
+}
+.gui-overlay-item {
+	position: absolute;
+	background-color: transparent;
+	border: none;
+}
+.gui-overlay-item a {
+	display: block;
+	width: 32px;
+	height: 32px;
+	cursor: pointer;
+	padding: 0px;
+
+}
+.gui-overlay-item a:focus {
+	/* Enhance focus visibility */
+	background-color: rgba(0, 0, 255, 0.3);
+}
+
+/* Game over overlay */
+#gui-game-over-overlay a.play-again {
+	position: absolute;
+	background-color: transparent;
+	display: block;
+	width: 640px;
+	height: 480px;
+	cursor: pointer;
+}
+
+/* Windows */
+.window {
+	position: absolute;
+	width: 384px;
+	height: 352px;
+	top: 64px;
+	left: 128px;
+	background-color: rgb(234,234,234);
+	border: 1px solid black;
+
+	font: 14px verdana;
+	line-height: 20px;
+}
+
+.window p {
+	margin: 0px;
+	padding: 0px;
+}
+
+/* Widgets */
+.window .widget {
+	display: block;
+	width: 372px; /* win width - 12 */
+	margin: 6px 6px 0 6px;
+}
+/* Instead of an actual spacer <div> being inserted, the widget
+ * after a spacer will get the extra-top-margin class set.
+ */
+.window .widget.extra-top-margin {
+	margin-top: 18px; /* 3 * 6 */
+}
+
+/* label widget */
+.window .wid-label .label {
+}
+
+/* value widget */
+.window .wid-value .label {
+	display: inline-block;
+	width: 200px;
+	overflow: none;
+}
+.window .wid-value .value {
+	display: inline-block;
+	width: 172px;
+	overflow: none;
+}
+
+/* cost-action widget */
+.window .wid-cost-action .label {
+	display: inline-block;
+	width: 200px;
+	overflow: none;
+}
+.window .wid-cost-action .cost {
+	display: inline-block;
+	width: 120px;
+	overflow: none;
+}
+.window .wid-cost-action .do-it {
+	display: inline-block;
+	width: 52px;
+	overflow: none;
+}
+
+/* close widget */
+.window .wid-close {
+	position: absolute;
+	bottom: 6px;
+}
+.window .wid-close .close {
+	display: block;
+	text-align: center;
+}
+.window a {
+	cursor: pointer;
+	color: blue;
+}
+.window a:hover {
+	background-color: blue !important;
+	color: white !important;
+}
+
+/* --- Generic classes --- */
+.hidden {
+	visibility: hidden !important;
+}
