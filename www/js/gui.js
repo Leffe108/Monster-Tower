@@ -271,8 +271,9 @@ function RebuildBuildNewOverlay(room_def) {
 						floor: floor_num,
 						x: x,
 					};
+					var width = Math.min(screen_pos[0] + room_def.width * 16, g_canvas.width) - screen_pos[0];
 					AddOverlayItem(overlay_data, 'Build on floor ' + floor_num + ', x: ' + x, 
-							screen_pos[0], screen_pos[1], room_def.width * 16, 'build-new', 'build_new');
+							screen_pos[0], screen_pos[1], width, 'build-new', 'build_new');
 				}
 			}
 		}
