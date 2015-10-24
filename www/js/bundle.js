@@ -1833,6 +1833,16 @@ function DrawImage(image, x, y, angle) {
 		g_context.restore();
 	}
 }
+/**
+ * Draws an image centered on the canvas.
+ */
+function DrawImageCentered(image) {
+	var img = g_images[image];
+	if (!img.complete || img.width <= 0) return;
+	var x = g_canvas.width/2 - img.width/2;
+	var y = g_canvas.height/2 - img.height/2;
+	DrawImage(image, x, y);
+}
 function TimeStr(time) {
 	var h = "" + Math.floor(time / 60);
 	var m = "" + Math.floor(Math.floor(time - h * 60) / 15) * 15;
@@ -1888,13 +1898,13 @@ function GetSkyColor() {
 function Render() {
 	// Should logo be displayed?
 	if (g_logo_timer >= 0 && !DISABLE_LOGO_INTRO) {
-		DrawImage(g_logo_timer < 1 ? "map1" : "map2", 0, 0);
+		DrawImageCentered(g_logo_timer < 1 ? "map1" : "map2");
 		return;
 	} else if (IsGameOver()) {
-		DrawImage("game-over", 0, 0);
+		DrawImageCentered("game-over");
 		return;
 	} else if (IsGameWon()) {
-		DrawImage("won", 0, 0);
+		DrawImageCentered("won");
 		return;
 	}
 
