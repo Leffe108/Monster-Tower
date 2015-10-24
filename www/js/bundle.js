@@ -240,6 +240,14 @@ function RebuildToolbars() {
 		id: 'view_down',
 	}, 'Scroll view down', x, y, 32, 'nav', 'toolbar');
 	x += 32;
+	AddOverlayItem({
+		id: 'view_left',
+	}, 'Scroll view left', x, y, 32, 'nav', 'toolbar');
+	x += 32;
+	AddOverlayItem({
+		id: 'view_right',
+	}, 'Scroll view right', x, y, 32, 'nav', 'toolbar');
+	x += 32;
 
 	AddOverlayItem({
 		id: 'game_star_level',
@@ -275,6 +283,14 @@ function RebuildToolbars() {
 	AddOverlayItem({
 		id: 'view_down',
 	}, 'Scroll view down', x, 0, 32, 'build-new', 'toolbar');
+	x += 32;
+	AddOverlayItem({
+		id: 'view_left',
+	}, 'Scroll view left', x, y, 32, 'build-new', 'toolbar');
+	x += 32;
+	AddOverlayItem({
+		id: 'view_right',
+	}, 'Scroll view right', x, y, 32, 'build-new', 'toolbar');
 	x += 32;
 }
 
@@ -316,13 +332,16 @@ function RebuildBuildNewOverlay(room_def) {
 					// not aware that they can use tab to select the toolbar button overlay.
 					if (screen_pos[1] < 32) continue;
 
+					if (screen_pos[1] >= g_canvas.height) continue;
+
 					var overlay_data = {
 						room_def: room_def,
 						floor: floor_num,
 						x: x,
 					};
+					var width = Math.min(screen_pos[0] + room_def.width * 16, g_canvas.width) - screen_pos[0];
 					AddOverlayItem(overlay_data, 'Build on floor ' + floor_num + ', x: ' + x, 
-							screen_pos[0], screen_pos[1], room_def.width * 16, 'build-new', 'build_new');
+							screen_pos[0], screen_pos[1], width, 'build-new', 'build_new');
 				}
 			}
 		}
@@ -368,6 +387,10 @@ function DrawToolbar() {
 		x += 32;
 		DrawImage('view-down', x, y, 0);
 		x += 32;
+		DrawImage('view-left', x, y, 0);
+		x += 32;
+		DrawImage('view-right', x, y, 0);
+		x += 32;
 
 		var star_button_image = '';
 		switch (g_game_star_level) {
@@ -406,6 +429,10 @@ function DrawToolbar() {
 		x += 32;
 		DrawImage('view-down', x, 0, 0);
 		x += 32;
+		DrawImage('view-left', x, 0, 0);
+		x += 32;
+		DrawImage('view-right', x, 0, 0);
+		x += 32;
 	}
 }
 
@@ -439,6 +466,16 @@ function ToolbarClick(toolbar_button) {
 			break;
 		case 'view_down':
 			g_view_offset_floor--;
+			if (IsBuildNewOverlayActive()) RebuildBuildNewOverlay(g_current_build_room_type);
+			RebuildNavOverlay();
+			break;
+		case 'view_left':
+			g_view_offset_x+= 5;
+			if (IsBuildNewOverlayActive()) RebuildBuildNewOverlay(g_current_build_room_type);
+			RebuildNavOverlay();
+			break;
+		case 'view_right':
+			g_view_offset_x-= 5;
 			if (IsBuildNewOverlayActive()) RebuildBuildNewOverlay(g_current_build_room_type);
 			RebuildNavOverlay();
 			break;
@@ -655,6 +692,7 @@ function ShowWindow(w) {
 		SwitchOverlay(OVERLAY_WINDOWS);
 	}
 	RenderWindowHtml(w);
+	PositionWindows();
 	g_open_windows.push(w);
 }
 
@@ -668,6 +706,22 @@ function CloseTopWindow() {
 	if (g_open_windows.length == 0) {
 		SwitchOverlay(OVERLAY_NAV);
 	}
+}
+
+/**
+ * Position windows on the screen
+ */
+function PositionWindows() {
+	var windows = $('.window');
+	if (windows.length === 0) return;
+	var win_width = windows.css('width').replace('px', '');
+	var win_height = windows.css('height').replace('px', '');
+
+	var x = g_canvas.width/2 - win_width/2;
+	var y = g_canvas.height/2 - win_height/2;
+
+	windows.css('left', x + 'px');
+	windows.css('top', y + 'px');
 }
 
 /**
@@ -1211,7 +1265,9 @@ function BuildRoom(room_type, floor_num, x) {
 
 function AddOverlayItemForRoom(room_data) {
 	var screen_pos = MapToScreen(room_data.x, room_data.floor);
-	room_data.overlay_item = AddOverlayItem(room_data, room_data.def.name, screen_pos[0], screen_pos[1], room_data.def.width * 16, 'nav', 'room');
+	if (screen_pos[1] >= g_canvas.height) return;
+	var width = Math.min(screen_pos[0] + room_data.width * 16, g_canvas.width) - screen_pos[0];
+	room_data.overlay_item = AddOverlayItem(room_data, room_data.def.name, screen_pos[0], screen_pos[1], width, 'nav', 'room');
 }
 
 function DemolishRoom(room_instance) {
@@ -1609,14 +1665,33 @@ requestAnimationFrame = null;
 function InitCanvas() {
 	g_canvas = document.createElement("canvas");
 	g_context = g_canvas.getContext("2d"); 
-	g_canvas.width = 640;
-	g_canvas.height = 480;
 	g_canvas.id = 'canvas';
 	var game = document.getElementById('game');
 	game.appendChild(g_canvas);
 
 	g_view_offset_floor = -4;
 	g_view_offset_x = 0;
+
+	ResizeCanvas();
+
+	window.onresize = function() {
+		ResizeCanvas();
+		PositionWindows();
+		RebuildToolbars();
+		if (IsBuildNewOverlayActive()) RebuildBuildNewOverlay(g_current_build_room_type);
+		RebuildNavOverlay();
+	}
+}
+
+function ResizeCanvas() {
+	var width = Math.floor(window.innerWidth / 16) * 16;
+	var height = Math.floor(window.innerHeight / 32) * 32;
+	g_canvas.width = width;
+	g_canvas.height = height;
+	$('#game').css('width', width);
+	$('#game').css('height', height);
+	$('#game').children().css('width', width);
+	$('#game').children().css('height', height);
 }
 
 /**
@@ -1660,6 +1735,8 @@ function LoadImages() {
 	LoadImage("help", 0, 0);
 	LoadImage("view-up", 0, 0);
 	LoadImage("view-down", 0, 0);
+	LoadImage("view-left", 0, 0);
+	LoadImage("view-right", 0, 0);
 	LoadImage("game-over", 0, 0);
 	LoadImage("won", 0, 0);
 	LoadImage("game-star-level-no-star", 0, 0);
@@ -1835,7 +1912,7 @@ function Render() {
 			var map_y = map_pos[1];
 
 			// Only draw background at 32x32
-			if (map_x % 2 == 0) {
+			if (Math.abs(map_x % 2) == Math.abs(g_view_offset_x % 2)) {
 				if (map_y >= 0) {
 					DrawRect(sky_color, '', screen_x, screen_y, 32, 32, sky_color);
 				} else {
