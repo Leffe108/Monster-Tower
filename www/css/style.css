@@ -66,10 +66,11 @@
 	width: 384px;
 	height: 352px;
 	background-color: rgb(234,234,234);
-	border: 1px solid black;
+	border: 1px solid rgb(20,20,20);
 
 	font: 14px verdana;
 	line-height: 20px;
+	border-radius: 10px;
 }
 
 .window p {
