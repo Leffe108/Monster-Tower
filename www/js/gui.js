@@ -266,6 +266,8 @@ function RebuildBuildNewOverlay(room_def) {
 					// not aware that they can use tab to select the toolbar button overlay.
 					if (screen_pos[1] < 32) continue;
 
+					if (screen_pos[1] >= g_canvas.height) continue;
+
 					var overlay_data = {
 						room_def: room_def,
 						floor: floor_num,
