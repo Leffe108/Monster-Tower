@@ -190,6 +190,14 @@ function RebuildToolbars() {
 		id: 'view_down',
 	}, 'Scroll view down', x, y, 32, 'nav', 'toolbar');
 	x += 32;
+	AddOverlayItem({
+		id: 'view_left',
+	}, 'Scroll view left', x, y, 32, 'nav', 'toolbar');
+	x += 32;
+	AddOverlayItem({
+		id: 'view_right',
+	}, 'Scroll view right', x, y, 32, 'nav', 'toolbar');
+	x += 32;
 
 	AddOverlayItem({
 		id: 'game_star_level',
@@ -225,6 +233,14 @@ function RebuildToolbars() {
 	AddOverlayItem({
 		id: 'view_down',
 	}, 'Scroll view down', x, 0, 32, 'build-new', 'toolbar');
+	x += 32;
+	AddOverlayItem({
+		id: 'view_left',
+	}, 'Scroll view left', x, y, 32, 'build-new', 'toolbar');
+	x += 32;
+	AddOverlayItem({
+		id: 'view_right',
+	}, 'Scroll view right', x, y, 32, 'build-new', 'toolbar');
 	x += 32;
 }
 
@@ -321,6 +337,10 @@ function DrawToolbar() {
 		x += 32;
 		DrawImage('view-down', x, y, 0);
 		x += 32;
+		DrawImage('view-left', x, y, 0);
+		x += 32;
+		DrawImage('view-right', x, y, 0);
+		x += 32;
 
 		var star_button_image = '';
 		switch (g_game_star_level) {
@@ -359,6 +379,10 @@ function DrawToolbar() {
 		x += 32;
 		DrawImage('view-down', x, 0, 0);
 		x += 32;
+		DrawImage('view-left', x, 0, 0);
+		x += 32;
+		DrawImage('view-right', x, 0, 0);
+		x += 32;
 	}
 }
 
@@ -392,6 +416,16 @@ function ToolbarClick(toolbar_button) {
 			break;
 		case 'view_down':
 			g_view_offset_floor--;
+			if (IsBuildNewOverlayActive()) RebuildBuildNewOverlay(g_current_build_room_type);
+			RebuildNavOverlay();
+			break;
+		case 'view_left':
+			g_view_offset_x+= 5;
+			if (IsBuildNewOverlayActive()) RebuildBuildNewOverlay(g_current_build_room_type);
+			RebuildNavOverlay();
+			break;
+		case 'view_right':
+			g_view_offset_x-= 5;
 			if (IsBuildNewOverlayActive()) RebuildBuildNewOverlay(g_current_build_room_type);
 			RebuildNavOverlay();
 			break;

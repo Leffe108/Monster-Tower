@@ -107,6 +107,8 @@ function LoadImages() {
 	LoadImage("help", 0, 0);
 	LoadImage("view-up", 0, 0);
 	LoadImage("view-down", 0, 0);
+	LoadImage("view-left", 0, 0);
+	LoadImage("view-right", 0, 0);
 	LoadImage("game-over", 0, 0);
 	LoadImage("won", 0, 0);
 	LoadImage("game-star-level-no-star", 0, 0);
@@ -282,7 +284,7 @@ function Render() {
 			var map_y = map_pos[1];
 
 			// Only draw background at 32x32
-			if (map_x % 2 == 0) {
+			if (Math.abs(map_x % 2) == Math.abs(g_view_offset_x % 2)) {
 				if (map_y >= 0) {
 					DrawRect(sky_color, '', screen_x, screen_y, 32, 32, sky_color);
 				} else {
