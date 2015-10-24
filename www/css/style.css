@@ -1,8 +1,6 @@
 /* --- Top container of the game --- */
 #game {
 	position: absolute;
-	width: 640px;
-	height: 480px;
 	top: 0;
 	bottom: 0;
 	left: 0;
@@ -13,8 +11,6 @@
 /* --- Canvas --- */
 #canvas {
 	position: absolute;
-	width: 640px;
-	height: 480px;
 	top: 0;
 	left: 0;
 	z-index: 1;
@@ -23,8 +19,6 @@
 /* --- GUI --- */
 #gui-window-overlay, #gui-nav-overlay, #gui-build-new-overlay, #gui-game-over-overlay {
 	position: absolute;
-	width: 640px;
-	height: 480px;
 	top: 0;
 	left: 0;
 }
@@ -63,8 +57,6 @@
 	position: absolute;
 	background-color: transparent;
 	display: block;
-	width: 640px;
-	height: 480px;
 	cursor: pointer;
 }
 
@@ -73,8 +65,6 @@
 	position: absolute;
 	width: 384px;
 	height: 352px;
-	top: 64px;
-	left: 128px;
 	background-color: rgb(234,234,234);
 	border: 1px solid black;
 

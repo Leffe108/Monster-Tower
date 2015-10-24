@@ -37,14 +37,33 @@ requestAnimationFrame = null;
 function InitCanvas() {
 	g_canvas = document.createElement("canvas");
 	g_context = g_canvas.getContext("2d"); 
-	g_canvas.width = 640;
-	g_canvas.height = 480;
 	g_canvas.id = 'canvas';
 	var game = document.getElementById('game');
 	game.appendChild(g_canvas);
 
 	g_view_offset_floor = -4;
 	g_view_offset_x = 0;
+
+	ResizeCanvas();
+
+	window.onresize = function() {
+		ResizeCanvas();
+		PositionWindows();
+		RebuildToolbars();
+		if (IsBuildNewOverlayActive()) RebuildBuildNewOverlay(g_current_build_room_type);
+		RebuildNavOverlay();
+	}
+}
+
+function ResizeCanvas() {
+	var width = Math.floor(window.innerWidth / 16) * 16;
+	var height = Math.floor(window.innerHeight / 32) * 32;
+	g_canvas.width = width;
+	g_canvas.height = height;
+	$('#game').css('width', width);
+	$('#game').css('height', height);
+	$('#game').children().css('width', width);
+	$('#game').children().css('height', height);
 }
 
 /**

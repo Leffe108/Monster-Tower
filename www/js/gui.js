@@ -608,6 +608,7 @@ function ShowWindow(w) {
 		SwitchOverlay(OVERLAY_WINDOWS);
 	}
 	RenderWindowHtml(w);
+	PositionWindows();
 	g_open_windows.push(w);
 }
 
@@ -621,6 +622,22 @@ function CloseTopWindow() {
 	if (g_open_windows.length == 0) {
 		SwitchOverlay(OVERLAY_NAV);
 	}
+}
+
+/**
+ * Position windows on the screen
+ */
+function PositionWindows() {
+	var windows = $('.window');
+	if (windows.length === 0) return;
+	var win_width = windows.css('width').replace('px', '');
+	var win_height = windows.css('height').replace('px', '');
+
+	var x = g_canvas.width/2 - win_width/2;
+	var y = g_canvas.height/2 - win_height/2;
+
+	windows.css('left', x + 'px');
+	windows.css('top', y + 'px');
 }
 
 /**
