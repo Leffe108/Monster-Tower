@@ -11,4 +11,4 @@ The game can be played using mouse (left button) or keyboard (tab + enter).
 http://junctioneer.net/monster-tower/
 
 # Ludum Dare 33
-This game was made as an entry for the Ludum Dare 33 game development competition.
+This game was made as an [entry](http://ludumdare.com/compo/ludum-dare-33/?action=preview&uid=38630) for the Ludum Dare 33 game development competition.
