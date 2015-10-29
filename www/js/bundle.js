@@ -1901,9 +1901,11 @@ function Render() {
 		DrawImageCentered(g_logo_timer < 1 ? "map1" : "map2");
 		return;
 	} else if (IsGameOver()) {
+		DrawRect('rgb(255, 255, 255)', '', 0, 0, g_canvas.width, g_canvas.height);
 		DrawImageCentered("game-over");
 		return;
 	} else if (IsGameWon()) {
+		DrawRect('rgb(255, 255, 255)', '', 0, 0, g_canvas.width, g_canvas.height);
 		DrawImageCentered("won");
 		return;
 	}
