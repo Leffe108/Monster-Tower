@@ -43,7 +43,7 @@ function UpdateMoney(time) {
 
 		if (balance_change < 0) {
 			AnimateCost();
-		} else {
+		} else if (balance_change > 0) {
 			AnimateIncome();
 		}
 
