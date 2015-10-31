@@ -292,17 +292,19 @@ function GetSkyColor() {
 	return 'rgb(' + color_blend[0] + ', ' + color_blend[1] + ', ' + color_blend[2] + ')';
 }
 function Render() {
-	// Should logo be displayed?
+	// Should a splash screen be displayed?
+	var splash_screen_image = null;
 	if (g_logo_timer >= 0 && !DISABLE_LOGO_INTRO) {
-		DrawImageCentered(g_logo_timer < 1 ? "map1" : "map2");
-		return;
+		splash_screen_image = g_logo_timer < 1 ? "map1" : "map2";
 	} else if (IsGameOver()) {
-		DrawRect('rgb(255, 255, 255)', '', 0, 0, g_canvas.width, g_canvas.height);
-		DrawImageCentered("game-over");
-		return;
+		splash_screen_image = "game-over";
 	} else if (IsGameWon()) {
+		splash_screen_image = "won";
+	}
+	if (splash_screen_image !== null) {
 		DrawRect('rgb(255, 255, 255)', '', 0, 0, g_canvas.width, g_canvas.height);
-		DrawImageCentered("won");
+		DrawImageCentered(splash_screen_image);
+		SwapCanvas();
 		return;
 	}
 
