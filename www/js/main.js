@@ -5,6 +5,7 @@ var g_canvas_visible = null; // The visible canvas
 var g_view_offset_floor = null;
 var g_view_offset_x = null;
 var g_context = null;
+var g_dirty_screen = null; // needs redraw? true/false
 var g_logo_timer = null;
 var g_images = null;
 var g_animations = null;
@@ -74,6 +75,7 @@ function ResizeCanvas() {
 	$('#game').css('height', height);
 	$('#game').children().css('width', width);
 	$('#game').children().css('height', height);
+	g_dirty_screen = true;
 }
 
 function SwapCanvas() {
@@ -176,6 +178,7 @@ function Update(time) {
 	// Still showing the logo?
 	if (g_logo_timer >= 0 && !DISABLE_LOGO_INTRO) {
 		g_logo_timer += gui_time;
+		g_dirty_screen = true;
 		if (g_logo_timer > 3) {
 			g_logo_timer = -1;
 			ShowWindow(GetIntroWindow());
@@ -189,11 +192,13 @@ function Update(time) {
 	if ((IsGameOver() || IsGameWon()) && !IsGameOverOverlayActive()) {
 		while (HasOpenWindows()) CloseTopWindow();
 		SwitchOverlay(OVERLAY_GAME_OVER);
+		g_dirty_screen = true;
 	}
 
 	// Progress game time unless paused
 	// - pause when window is open, as many display stats that don't update unless the
 	//   window is re-opened.
+	var old_paused = g_game_paused;
 	g_game_paused = IsIntroWindowOpen() || HasOpenWindows() || IsGameOver() || IsGameWon();
 	if (!g_game_paused) {
 		g_simulation_time += time; // one second = one in-game minute
@@ -205,6 +210,15 @@ function Update(time) {
 		UpdateRooms(time);
 		UpdateMoney(time);
 		UpdateGameLevel(time);
+
+		g_dirty_screen = true;
+	} else if (!old_paused) {
+		// just became paused
+		g_dirty_screen = true;
+	}
+
+	if (g_animations.length > 0) {
+		g_dirty_screen = true;
 	}
 
 	// Always update GUI
@@ -421,7 +435,8 @@ function Main() {
 	var delta = now - g_last_loop;
 
 	Update(delta / 1000);
-	Render();
+	if (g_dirty_screen) Render();
+	g_dirty_screen = false;
 
 	g_last_loop = now;
 
