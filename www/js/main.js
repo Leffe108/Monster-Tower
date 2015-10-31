@@ -17,7 +17,7 @@ var g_simulation_time = null; // unit: minutes (total 24*60 a day)
 var g_simulation_day = null; // day counter
 var g_game_win_lose = null; // WL_* from game_level.js
 var g_game_star_level = null; // GSL_* from game_level.js
-var g_last_loop = null;
+var g_last_loop = null; // last loop time
 var g_game_speed = null;
 var g_game_paused = null;
 var g_bank_balance = null; // amount of money for our company
@@ -130,6 +130,8 @@ function LoadImages() {
 
 	// GUI
 	LoadImage("build-complete", 0, 0);
+	LoadImage("load", 0, 0);
+	LoadImage("save", 0, 0);
 	LoadImage("help", 0, 0);
 	LoadImage("view-up", 0, 0);
 	LoadImage("view-down", 0, 0);

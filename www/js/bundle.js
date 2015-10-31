@@ -47,6 +47,34 @@ function StrFirstToUpper(string) {
 	return string.substr(0, 1).toLocaleUpperCase() +
 		string.substr(1);
 }
+
+/**
+ * From: https://github.com/angular/angular.js/blob/v1.3.14/src/ngSanitize/sanitize.js#L435
+ * Escapes all potentially dangerous characters, so that the
+ * resulting string can be safely inserted into attribute or
+ * element text.
+ * @param value
+ * @returns {string} escaped text
+ */
+function EncodeEntities(value) {
+	// Regular Expressions for parsing tags and attributes
+	var SURROGATE_PAIR_REGEXP = /[\uD800-\uDBFF][\uDC00-\uDFFF]/g,
+		// Match everything outside of normal chars and " (quote character)
+		NON_ALPHANUMERIC_REGEXP = /([^\#-~ |!])/g;
+
+	return value.
+		replace(/&/g, '&amp;').
+		replace(SURROGATE_PAIR_REGEXP, function(value) {
+			var hi = value.charCodeAt(0);
+			var low = value.charCodeAt(1);
+			return '&#' + (((hi - 0xD800) * 0x400) + (low - 0xDC00) + 0x10000) + ';';
+		}).
+		replace(NON_ALPHANUMERIC_REGEXP, function(value) {
+			return '&#' + value.charCodeAt(0) + ';';
+		}).
+		replace(/</g, '&lt;').
+		replace(/>/g, '&gt;');
+}
 /**** FILE js/js/gui.js STARTS HERE ****/
 /*
  * GUI related stuff
@@ -233,6 +261,14 @@ function RebuildToolbars() {
 	}, 'Help', x, y, 32, 'nav', 'toolbar');
 	x += 32;
 	AddOverlayItem({
+		id: 'load',
+	}, 'Load', x, y, 32, 'nav', 'toolbar');
+	x += 32;
+	AddOverlayItem({
+		id: 'save',
+	}, 'Save', x, y, 32, 'nav', 'toolbar');
+	x += 32;
+	AddOverlayItem({
 		id: 'view_up',
 	}, 'Scroll view up', x, y, 32, 'nav', 'toolbar');
 	x += 32;
@@ -383,6 +419,10 @@ function DrawToolbar() {
 	if (IsNavOverlayActive()) {
 		DrawImage('help', x, y, 0);
 		x += 32;
+		DrawImage('load', x, y, 0);
+		x += 32;
+		DrawImage('save', x, y, 0);
+		x += 32;
 		DrawImage('view-up', x, y, 0);
 		x += 32;
 		DrawImage('view-down', x, y, 0);
@@ -458,6 +498,12 @@ function ToolbarClick(toolbar_button) {
 	switch (toolbar_button.id) {
 		case 'help':
 			ShowWindow(GetHelpWindow());
+			break;
+		case 'load':
+			ShowWindow(GetLoadWindow());
+			break;
+		case 'save':
+			ShowWindow(GetSaveWindow());
 			break;
 		case 'view_up':
 			g_view_offset_floor++;
@@ -658,6 +704,49 @@ function GetHelpWindow() {
 	return w;
 }
 /*
+ * Factory for load window
+ * Don't call with 'new'
+ */
+function GetLoadWindow() {
+	var w = new Window();
+	w.type = 'load';
+	w.widgets = [
+		new WidLabel('Load game', 'center'),
+		new WidSpacer(),
+		new WidLabel(
+			'Paste the save data below, and then click on Load game below. It is the text you got in ' +
+			'the text box when you or your friend clicked on save.'
+		),
+		new WidTextArea('Save data', '', 'load_json'),
+		new WidCostAction('Load game', MoneyStr(0), 'load_json_game'),
+		new WidSpacer(),
+		new WidSpacer(),
+		new WidLabel('New game', 'center'),
+		new WidCostAction('New game', MoneyStr(0), 'new_game'),
+		new WidClose(),
+	];
+	return w;
+}
+/*
+ * Factory for save window
+ * Don't call with 'new'
+ */
+function GetSaveWindow() {
+	var w = new Window();
+	w.type = 'save';
+	w.widgets = [
+		new WidLabel('Save game', 'center'),
+		new WidSpacer(),
+		new WidLabel(
+			'Copy save data text below and save somewhere safe, or email a friend:'
+		),
+		new WidTextArea('Save data', SaveGameStateToJsonStr(), 'save_json'),
+		new WidClose(),
+	];
+	return w;
+}
+
+/*
  * Factory for intro window
  * Don't call with 'new'
  */
@@ -768,6 +857,10 @@ function RenderWindowHtml(w) {
 				$(widget_div).append('<p class="label">' + widget.label + '</p>');
 				$(widget_div).append('<input class="value" type="number" value="' + widget.value + '">');
 				break;
+			case 'textarea':
+				$(widget_div).append('<p class="label">' + widget.label + '</p>');
+				$(widget_div).append('<textarea>' + EncodeEntities(widget.value) + '</textarea>');
+				break;
 			case 'cost_action':
 				$(widget_div).append('<p class="label">' + widget.label + '</p>');
 				$(widget_div).append('<p class="cost">' + widget.cost + '</p>');
@@ -853,6 +946,21 @@ function WidValueEdit(label, value, name) {
 WidValueEdit.prototype = new Widget();
 
 /** 
+ * Text area:
+ * <label>
+ * <textarea>
+ *
+ * @param name Logic name
+ */
+function WidTextArea(label, value, name) {
+	this.type = 'textarea';
+	this.label = label;
+	this.value = value;
+	this.name = name;
+}
+WidTextArea.prototype = new Widget();
+
+/**
  * Cost Action
  * <label>   <cost>    <Do it! button>
  *
@@ -917,6 +1025,31 @@ function WidgetAction(w, widget_name, widget_type) {
 					break;
 			}
 			break;
+
+		case 'load':
+			switch (widget_name) {
+				case 'new_game':
+					InitGameState();
+					CloseTopWindow();
+					RebuildToolbars();
+					RebuildNavOverlay();
+					if (IsBuildNewOverlayActive()) SwitchOverlay(OVERLAY_NAV);
+					break;
+
+				case 'load_json_game':
+					var json_str = $(w.dom_node).find('textarea').val();
+					var loaded = LoadGameStateFromJsonStr(json_str);
+					if (loaded) {
+						CloseTopWindow();
+					} else {
+						ShowWindow(GetMessageWindow('Load failed', ['Loading the game data failed. :-(']));
+						g_dirty_screen = true;
+					}
+					RebuildToolbars();
+					RebuildNavOverlay();
+					if (IsBuildNewOverlayActive()) SwitchOverlay(OVERLAY_NAV);
+					break;
+			}
 	}
 }
 
@@ -1201,6 +1334,15 @@ function GetRoomCount(room_type) {
 	}
 
 	return count;
+}
+
+function ValidateRoom(room) {
+	// Currently only room.state is validated
+	return [
+		ROOM_STATE_FOR_RENT,
+		ROOM_STATE_OPEN,
+		ROOM_STATE_CLOSED,
+	].indexOf(room.state) !== -1;
 }
 /**** FILE js/js/building.js STARTS HERE ****/
 
@@ -1542,6 +1684,8 @@ var WIN_GAME_MIN_FLOORS = 50;
 
 /**
  * Game Win Lose (GWL) status.
+ *
+ * @note When adding new items, don't forget to update IsValidGameWinLose function
  */
 var GWL_GAME_OVER = 0;   // You lost
 var GWL_NORMAL_PLAY = 1; // Game started. You didn't lose nor win yet
@@ -1551,6 +1695,8 @@ var GWL_WON_CONTINUE_PLAY = 11; // Continue to play (hide winning screen)
 /*
  * The Game Star Level (GSL) start at GSL_NO_STAR and can then progress
  * to max number of stars
+ *
+ * @note When adding new items, don't forget to update IsValidGameStarLevel function
  */
 var GSL_NO_STAR = 0;
 var GSL_STAR1 = 1; // Code assumes that STAR1 is 1, STAR2 is 2 etc. in generic code
@@ -1625,6 +1771,144 @@ function IsGameOver() {
 function IsGameWon() {
 	return g_game_win_lose === GWL_WON;
 }
+
+/**
+ * Validate if given value is a valid Game Win Lose value
+ */
+function IsValidGameWinLose(value) {
+	if (typeof value !== 'number') return false;
+	return [
+		GWL_GAME_OVER,
+		GWL_NORMAL_PLAY,
+		GWL_WON,
+		GWL_WON_CONTINUE_PLAY,
+	].indexOf(value) !== -1;
+}
+
+/**
+ * Validate if given value is a valid Game Star Level value.
+ */
+function IsValidGameStarLevel(value) {
+	if (typeof value !== 'number') return false;
+	return [
+		GSL_NO_STAR,
+		GSL_STAR1,
+		GSL_STAR2,
+		GSL_STAR3,
+	].indexOf(value) !== -1;
+}
+/**** FILE js/js/saveload.js STARTS HERE ****/
+/*
+ * Save/load
+ */
+
+/**
+ * Return the current game state as a JSON string.
+ */
+function SaveGameStateToJsonStr() {
+	return JSON.stringify({
+		'simulation_time' : g_simulation_time,
+		'simulation_day' : g_simulation_day,
+		'game_win_lose': g_game_win_lose,
+		'game_star_level': g_game_star_level,
+		'bank_balance': g_bank_balance,
+		'room_floors': SaveRoomListToJsonObj(g_room_floors),
+		'stair_floors': SaveRoomListToJsonObj(g_stair_floors),
+	});
+}
+
+/**
+ * Load game state from provided JSON string
+ */
+function LoadGameStateFromJsonStr(json_str) {
+	// Parse JSON str to object
+	try {
+		var obj = JSON.parse(json_str);
+		if (obj === null) return false;
+	} catch (e) {
+		return false;
+	}
+
+	// Load data
+	try {
+		InitGameState();
+
+		// Import
+		g_simulation_time = obj.simulation_time;
+		g_game_win_lose = obj.game_win_lose;
+		g_game_star_level = obj.game_star_level;
+		g_bank_balance = obj.bank_balance;
+		g_room_floors = LoadRoomFloorsFromJsonObj(obj.room_floors);
+		g_stair_floors = LoadRoomFloorsFromJsonObj(obj.stair_floors);
+
+		// Validation
+		var valid = true;
+		valid &= typeof g_simulation_time === 'number';
+		valid &= IsValidGameWinLose(g_game_win_lose);
+		valid &= IsValidGameStarLevel(g_game_star_level);
+		valid &= typeof g_bank_balance === 'number';
+		valid &= g_room_floors !== false;
+		valid &= g_stair_floors !== false;
+		if (!valid) {
+			InitGameState();
+			return false;
+		}
+
+		return true;
+	} catch(e) {
+		InitGameState();
+		return false;
+	}
+}
+
+// -- Helpers --
+
+/**
+ * Return a object ready for JSON string conversion where 
+ * the room.def pointer has been changed into the room 
+ * definition id string.
+ */
+function SaveRoomListToJsonObj(floor_container) {
+	var result = {};
+	for (floor in floor_container) {
+		result[floor] = [];
+		for (var i_room = 0; i_room < floor_container[floor].length; i_room++) {
+			var room = floor_container[floor][i_room];
+
+			// Create a copy and change def into the id string
+			var room_copy = JSON.parse(JSON.stringify(room));
+			room_copy.def = room.def.id;
+			room_copy.overlay_item = null; // Don't save the overlay item
+			result[floor].push(room_copy);
+		}
+	}
+	return result;
+}
+
+/**
+ * Iterate over the imported object from JSON string
+ * and update all room.def from strings to pointers.
+ *
+ * If the room type doesn't exist, the method
+ * returns boolean false, otherwise the floor
+ * container.
+ */
+function LoadRoomFloorsFromJsonObj(floor_container) {
+	if (typeof floor_container !== 'object') return false;
+
+	for (floor in floor_container) {
+		for (var i_room = 0; i_room < floor_container[floor].length; i_room++) {
+			var room = floor_container[floor][i_room];
+
+			if (!room.def in g_room_types) return false;
+			room.def = g_room_types[room.def];
+			room.overlay_item = null;
+			if (!ValidateRoom(room)) return false;
+		}
+	}
+
+	return floor_container;
+}
 /**** FILE js/js/main.js STARTS HERE ****/
 
 // Global variables
@@ -1645,7 +1929,7 @@ var g_simulation_time = null; // unit: minutes (total 24*60 a day)
 var g_simulation_day = null; // day counter
 var g_game_win_lose = null; // WL_* from game_level.js
 var g_game_star_level = null; // GSL_* from game_level.js
-var g_last_loop = null;
+var g_last_loop = null; // last loop time
 var g_game_speed = null;
 var g_game_paused = null;
 var g_bank_balance = null; // amount of money for our company
@@ -1758,6 +2042,8 @@ function LoadImages() {
 
 	// GUI
 	LoadImage("build-complete", 0, 0);
+	LoadImage("load", 0, 0);
+	LoadImage("save", 0, 0);
 	LoadImage("help", 0, 0);
 	LoadImage("view-up", 0, 0);
 	LoadImage("view-down", 0, 0);

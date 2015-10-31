@@ -197,3 +197,12 @@ function GetRoomCount(room_type) {
 
 	return count;
 }
+
+function ValidateRoom(room) {
+	// Currently only room.state is validated
+	return [
+		ROOM_STATE_FOR_RENT,
+		ROOM_STATE_OPEN,
+		ROOM_STATE_CLOSED,
+	].indexOf(room.state) !== -1;
+}

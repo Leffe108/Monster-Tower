@@ -109,6 +109,19 @@
 	overflow: none;
 }
 
+/* textarea widget */
+.window .wid-textarea .label {
+	display: block;
+	width: 366;
+	overflow: none;
+}
+.window .wid-textarea textarea {
+	display: block;
+	width: 366px;
+	height: 5em;
+	overflow: none;
+}
+
 /* cost-action widget */
 .window .wid-cost-action .label {
 	display: inline-block;

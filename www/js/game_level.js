@@ -18,6 +18,8 @@ var WIN_GAME_MIN_FLOORS = 50;
 
 /**
  * Game Win Lose (GWL) status.
+ *
+ * @note When adding new items, don't forget to update IsValidGameWinLose function
  */
 var GWL_GAME_OVER = 0;   // You lost
 var GWL_NORMAL_PLAY = 1; // Game started. You didn't lose nor win yet
@@ -27,6 +29,8 @@ var GWL_WON_CONTINUE_PLAY = 11; // Continue to play (hide winning screen)
 /*
  * The Game Star Level (GSL) start at GSL_NO_STAR and can then progress
  * to max number of stars
+ *
+ * @note When adding new items, don't forget to update IsValidGameStarLevel function
  */
 var GSL_NO_STAR = 0;
 var GSL_STAR1 = 1; // Code assumes that STAR1 is 1, STAR2 is 2 etc. in generic code
@@ -100,4 +104,30 @@ function IsGameOver() {
 
 function IsGameWon() {
 	return g_game_win_lose === GWL_WON;
+}
+
+/**
+ * Validate if given value is a valid Game Win Lose value
+ */
+function IsValidGameWinLose(value) {
+	if (typeof value !== 'number') return false;
+	return [
+		GWL_GAME_OVER,
+		GWL_NORMAL_PLAY,
+		GWL_WON,
+		GWL_WON_CONTINUE_PLAY,
+	].indexOf(value) !== -1;
+}
+
+/**
+ * Validate if given value is a valid Game Star Level value.
+ */
+function IsValidGameStarLevel(value) {
+	if (typeof value !== 'number') return false;
+	return [
+		GSL_NO_STAR,
+		GSL_STAR1,
+		GSL_STAR2,
+		GSL_STAR3,
+	].indexOf(value) !== -1;
 }

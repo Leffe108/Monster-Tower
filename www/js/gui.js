@@ -183,6 +183,14 @@ function RebuildToolbars() {
 	}, 'Help', x, y, 32, 'nav', 'toolbar');
 	x += 32;
 	AddOverlayItem({
+		id: 'load',
+	}, 'Load', x, y, 32, 'nav', 'toolbar');
+	x += 32;
+	AddOverlayItem({
+		id: 'save',
+	}, 'Save', x, y, 32, 'nav', 'toolbar');
+	x += 32;
+	AddOverlayItem({
 		id: 'view_up',
 	}, 'Scroll view up', x, y, 32, 'nav', 'toolbar');
 	x += 32;
@@ -333,6 +341,10 @@ function DrawToolbar() {
 	if (IsNavOverlayActive()) {
 		DrawImage('help', x, y, 0);
 		x += 32;
+		DrawImage('load', x, y, 0);
+		x += 32;
+		DrawImage('save', x, y, 0);
+		x += 32;
 		DrawImage('view-up', x, y, 0);
 		x += 32;
 		DrawImage('view-down', x, y, 0);
@@ -408,6 +420,12 @@ function ToolbarClick(toolbar_button) {
 	switch (toolbar_button.id) {
 		case 'help':
 			ShowWindow(GetHelpWindow());
+			break;
+		case 'load':
+			ShowWindow(GetLoadWindow());
+			break;
+		case 'save':
+			ShowWindow(GetSaveWindow());
 			break;
 		case 'view_up':
 			g_view_offset_floor++;
@@ -608,6 +626,49 @@ function GetHelpWindow() {
 	return w;
 }
 /*
+ * Factory for load window
+ * Don't call with 'new'
+ */
+function GetLoadWindow() {
+	var w = new Window();
+	w.type = 'load';
+	w.widgets = [
+		new WidLabel('Load game', 'center'),
+		new WidSpacer(),
+		new WidLabel(
+			'Paste the save data below, and then click on Load game below. It is the text you got in ' +
+			'the text box when you or your friend clicked on save.'
+		),
+		new WidTextArea('Save data', '', 'load_json'),
+		new WidCostAction('Load game', MoneyStr(0), 'load_json_game'),
+		new WidSpacer(),
+		new WidSpacer(),
+		new WidLabel('New game', 'center'),
+		new WidCostAction('New game', MoneyStr(0), 'new_game'),
+		new WidClose(),
+	];
+	return w;
+}
+/*
+ * Factory for save window
+ * Don't call with 'new'
+ */
+function GetSaveWindow() {
+	var w = new Window();
+	w.type = 'save';
+	w.widgets = [
+		new WidLabel('Save game', 'center'),
+		new WidSpacer(),
+		new WidLabel(
+			'Copy save data text below and save somewhere safe, or email a friend:'
+		),
+		new WidTextArea('Save data', SaveGameStateToJsonStr(), 'save_json'),
+		new WidClose(),
+	];
+	return w;
+}
+
+/*
  * Factory for intro window
  * Don't call with 'new'
  */
@@ -718,6 +779,10 @@ function RenderWindowHtml(w) {
 				$(widget_div).append('<p class="label">' + widget.label + '</p>');
 				$(widget_div).append('<input class="value" type="number" value="' + widget.value + '">');
 				break;
+			case 'textarea':
+				$(widget_div).append('<p class="label">' + widget.label + '</p>');
+				$(widget_div).append('<textarea>' + EncodeEntities(widget.value) + '</textarea>');
+				break;
 			case 'cost_action':
 				$(widget_div).append('<p class="label">' + widget.label + '</p>');
 				$(widget_div).append('<p class="cost">' + widget.cost + '</p>');
@@ -803,6 +868,21 @@ function WidValueEdit(label, value, name) {
 WidValueEdit.prototype = new Widget();
 
 /** 
+ * Text area:
+ * <label>
+ * <textarea>
+ *
+ * @param name Logic name
+ */
+function WidTextArea(label, value, name) {
+	this.type = 'textarea';
+	this.label = label;
+	this.value = value;
+	this.name = name;
+}
+WidTextArea.prototype = new Widget();
+
+/**
  * Cost Action
  * <label>   <cost>    <Do it! button>
  *
@@ -867,6 +947,31 @@ function WidgetAction(w, widget_name, widget_type) {
 					break;
 			}
 			break;
+
+		case 'load':
+			switch (widget_name) {
+				case 'new_game':
+					InitGameState();
+					CloseTopWindow();
+					RebuildToolbars();
+					RebuildNavOverlay();
+					if (IsBuildNewOverlayActive()) SwitchOverlay(OVERLAY_NAV);
+					break;
+
+				case 'load_json_game':
+					var json_str = $(w.dom_node).find('textarea').val();
+					var loaded = LoadGameStateFromJsonStr(json_str);
+					if (loaded) {
+						CloseTopWindow();
+					} else {
+						ShowWindow(GetMessageWindow('Load failed', ['Loading the game data failed. :-(']));
+						g_dirty_screen = true;
+					}
+					RebuildToolbars();
+					RebuildNavOverlay();
+					if (IsBuildNewOverlayActive()) SwitchOverlay(OVERLAY_NAV);
+					break;
+			}
 	}
 }
 
