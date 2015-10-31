@@ -1,6 +1,7 @@
 
 // Global variables
-var g_canvas = null;
+var g_canvas = null; // The hidden canvas to draw to
+var g_canvas_visible = null; // The visible canvas
 var g_view_offset_floor = null;
 var g_view_offset_x = null;
 var g_context = null;
@@ -35,11 +36,18 @@ var INITIAL_BUILDING = false;
 requestAnimationFrame = null;
 
 function InitCanvas() {
+	// Create two canvases for double buffering.
+	// On some browsers/devices the game flickers without it.
 	g_canvas = document.createElement("canvas");
-	g_context = g_canvas.getContext("2d"); 
-	g_canvas.id = 'canvas';
+	g_canvas.className = 'canvas';
+	g_canvas_visible = document.createElement("canvas");
+	g_canvas_visible.className = 'canvas';
+
 	var game = document.getElementById('game');
 	game.appendChild(g_canvas);
+	game.appendChild(g_canvas_visible);
+
+	SwapCanvas();
 
 	g_view_offset_floor = -4;
 	g_view_offset_x = 0;
@@ -60,10 +68,26 @@ function ResizeCanvas() {
 	var height = Math.floor(window.innerHeight / 32) * 32;
 	g_canvas.width = width;
 	g_canvas.height = height;
+	g_canvas_visible.width = width;
+	g_canvas_visible.height = height;
 	$('#game').css('width', width);
 	$('#game').css('height', height);
 	$('#game').children().css('width', width);
 	$('#game').children().css('height', height);
+}
+
+function SwapCanvas() {
+	// Swap visibility
+	g_canvas.style.visibility = 'visible';
+	g_canvas_visible.style.visibility = 'hidden';
+
+	// Swap references
+	var new_visible = g_canvas;
+	g_canvas = g_canvas_visible;
+	g_canvas_visible = new_visible;
+
+	// Get context of the new hidden canvas
+	g_context = g_canvas.getContext("2d");
 }
 
 /**
@@ -384,6 +408,9 @@ function Render() {
 
 	// Draw GUI
 	DrawWindows();
+
+	// Last, swap visible buffer
+	SwapCanvas();
 }
 
 // Main game loop
