@@ -1912,6 +1912,7 @@ function LoadRoomFloorsFromJsonObj(floor_container) {
 /**** FILE js/js/main.js STARTS HERE ****/
 
 // Global variables
+var g_request_animation_frame_fn = null; // The requestAnimationFrame function 
 var g_canvas = null; // The hidden canvas to draw to
 var g_canvas_visible = null; // The visible canvas
 var g_view_offset_floor = null;
@@ -1946,7 +1947,6 @@ var DISABLE_LOGO_INTRO = false;
 var INITIAL_BUILDING = false;
 
 // Methods
-requestAnimationFrame = null;
 
 function InitCanvas() {
 	// Create two canvases for double buffering.
@@ -2355,8 +2355,8 @@ function Main() {
 	g_last_loop = now;
 
 	// Request to do this again ASAP
-	if (requestAnimationFrame) {
-		requestAnimationFrame(Main);
+	if (g_request_animation_frame_fn ) {
+		g_request_animation_frame_fn(Main);
 	} else {
 		window.setTimeout(Main, 1);
 	}
@@ -2375,7 +2375,7 @@ function Init() {
 
 	// Cross-browser support for requestAnimationFrame
 	var w = window;
-	requestAnimationFrame = w.requestAnimationFrame || w.webkitRequestAnimationFrame || w.msRequestAnimationFrame || w.mozRequestAnimationFrame;
+	g_request_animation_frame_fn = w.requestAnimationFrame || w.webkitRequestAnimationFrame || w.msRequestAnimationFrame || w.mozRequestAnimationFrame;
 	
 	// Start main loop
 	g_last_loop = Date.now();
