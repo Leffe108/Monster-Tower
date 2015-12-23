@@ -492,7 +492,7 @@ function HasOpenWindows() {
 function Window(caption) {
 	this.type = 'window';
 	this.widgets = [
-		new WidLabel(caption, 'center'),
+		new WidLabel(caption, 'center', 'h2'),
 		new WidClose(),
 	];
 	this.dom_node = null; ///< Reference to DOM node object
@@ -509,7 +509,7 @@ function GetMessageWindow(caption, lines) {
 	var w = new Window();
 	w.type = 'intro';
 	w.widgets = [
-		new WidLabel(caption, 'center'),
+		new WidLabel(caption, 'center', 'h2'),
 	];
 	for (var i = 0; i < lines.length; i++) {
 		if (lines[i] == '') {
@@ -534,7 +534,7 @@ function GetRoomWindow(room) {
 
 	var for_rent = room.state === ROOM_STATE_FOR_RENT;
 
-	w.widgets.push(new WidLabel(StrFirstToUpper(room.def.name) + ' at floor ' + room.floor, 'center'));
+	w.widgets.push(new WidLabel(StrFirstToUpper(room.def.name) + ' at floor ' + room.floor, 'center', 'h2'));
 	w.widgets.push(new WidValue("Maintenance cost", MoneyStr(room.def.maint_cost) + ' / day'));
 	if (!IsStairLayerRoom(room.def.id)) { // Stairs give no income
 		w.widgets.push(new WidValue("Rent income", MoneyStr(for_rent ? 0 : room.def.rent_income) + ' / day'));
@@ -556,7 +556,7 @@ function GetGameStarLevelWindow() {
 	var stars = g_game_star_level;
 	var s = stars >= 2 || stars === 0 ? 's' : '';
 	var req_next_star_str = 'Requirements for next star: [you got / you need]';
-	w.widgets.push(new WidLabel('You have ' + stars + ' star' + s, 'center'));
+	w.widgets.push(new WidLabel('You have ' + stars + ' star' + s, 'center', 'h2'));
 	switch (g_game_star_level) {
 		case GSL_NO_STAR:
 			w.widgets.push(new WidSpacer());
@@ -600,7 +600,7 @@ function GetHelpWindow() {
 	var w = new Window();
 	w.type = 'help';
 	w.widgets = [
-		new WidLabel('Help', 'center'),
+		new WidLabel('Help', 'center', 'h2'),
 		new WidSpacer(),
 		new WidLabel(
 			'Remember to build stairs or elevators so people ' +
@@ -633,7 +633,7 @@ function GetLoadWindow() {
 	var w = new Window();
 	w.type = 'load';
 	w.widgets = [
-		new WidLabel('Load game', 'center'),
+		new WidLabel('Load game', 'center', 'h2'),
 		new WidSpacer(),
 		new WidLabel(
 			'Paste the save data below, and then click on Load game below. It is the text you got in ' +
@@ -657,7 +657,7 @@ function GetSaveWindow() {
 	var w = new Window();
 	w.type = 'save';
 	w.widgets = [
-		new WidLabel('Save game', 'center'),
+		new WidLabel('Save game', 'center', 'h2'),
 		new WidSpacer(),
 		new WidLabel(
 			'Copy save data text below and save somewhere safe, or email a friend:'
@@ -676,7 +676,7 @@ function GetIntroWindow() {
 	var w = new Window();
 	w.type = 'intro';
 	w.widgets = [
-		new WidLabel('Welcome to Monster Tower', 'center'),
+		new WidLabel('Welcome to Monster Tower', 'center', 'h2'),
 		new WidLabel(
 			'Monster is a small town nearby The Hague in the ' +
 			'Netherlands.', 'left'
@@ -769,7 +769,7 @@ function RenderWindowHtml(w) {
 				spacer = true;
 				continue;
 			case 'label':
-				$(widget_div).append('<p class="label" style="text-align:' + widget.align + '">' + widget.label + '</p>');
+				$(widget_div).append('<'+widget.nodeName+' class="label" style="text-align:' + widget.align + '">' + widget.label + '</'+widget.nodeName+'>');
 				break;
 			case 'value':
 				$(widget_div).append('<p class="label">' + widget.label + '</p>');
@@ -834,11 +834,13 @@ function Widget() {
  * Just a label:
  * <label>
  * @param align 'center' or 'left'
+ * @param nodeName 'p', 'h1', 'h2' or anything. Defaults to 'p'
  */
-function WidLabel(label, align) {
+function WidLabel(label, align, nodeName) {
 	this.type = 'label';
 	this.label = label;
-	this.align = align
+	this.align = align;
+	this.nodeName = nodeName || 'p';
 }
 WidLabel.prototype = new Widget();
 
