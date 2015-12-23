@@ -41,8 +41,12 @@ function InitCanvas() {
 	// On some browsers/devices the game flickers without it.
 	g_canvas = document.createElement("canvas");
 	g_canvas.className = 'canvas';
+	g_canvas.setAttribute('aria-hidden', true);
+	g_canvas.setAttribute('aria-live', 'off');
 	g_canvas_visible = document.createElement("canvas");
 	g_canvas_visible.className = 'canvas';
+	g_canvas_visible.setAttribute('aria-hidden', true);
+	g_canvas_visible.setAttribute('aria-live', 'off');
 
 	var game = document.getElementById('game');
 	game.appendChild(g_canvas);

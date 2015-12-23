@@ -757,6 +757,12 @@ function UpdateWindows(gui_time) {
 function RenderWindowHtml(w) {
 	var window_div = document.createElement('div');
 	window_div.className = 'window';
+
+	var aria_div = document.createElement('div');
+	aria_div.appendChild(document.createTextNode('Window content: '));
+	aria_div.className = 'visually-hidden';
+	window_div.appendChild(aria_div);
+
 	var spacer = false; // was previous widget a spacer?
 	for (var i = 0; i < w.widgets.length; i++) {
 		var widget = w.widgets[i];

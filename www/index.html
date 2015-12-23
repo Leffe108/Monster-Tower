@@ -38,17 +38,18 @@
 	</head>
 	<body>
 		<script src="js/jquery-1.11.3.min.js"></script>
-		<div id="game" role="main">
-			<div id="gui-nav-overlay" class="hidden">
+		<div id="game" role="main" aria-live="polite">
+			<h1 class="visually-hidden">Monster Tower</h1>
+			<div id="gui-nav-overlay" class="hidden" aria-live="off">
 				<ul data-nav-type="toolbar"></ul>
 				<ul data-nav-type="room"></ul>
 			</div>
-			<div id="gui-build-new-overlay" class="hidden">
+			<div id="gui-build-new-overlay" class="hidden" aria-live="off">
 				<ul data-nav-type="toolbar"></ul>
 				<ul data-nav-type="build_new"></ul>
 			</div>
 			<div id="gui-window-overlay" class="hidden" aria-live="polite"></div>
-			<div id="gui-game-over-overlay" class="hidden"></div>
+			<div id="gui-game-over-overlay" class="hidden" aria-live="off"></div>
 		</div>
 
 		<!-- Sound effects -->

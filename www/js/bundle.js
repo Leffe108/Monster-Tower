@@ -1227,6 +1227,12 @@ function UpdateWindows(gui_time) {
 function RenderWindowHtml(w) {
 	var window_div = document.createElement('div');
 	window_div.className = 'window';
+
+	var aria_div = document.createElement('div');
+	aria_div.appendChild(document.createTextNode('Window content: '));
+	aria_div.className = 'visually-hidden';
+	window_div.appendChild(aria_div);
+
 	var spacer = false; // was previous widget a spacer?
 	for (var i = 0; i < w.widgets.length; i++) {
 		var widget = w.widgets[i];
@@ -1586,8 +1592,12 @@ function InitCanvas() {
 	// On some browsers/devices the game flickers without it.
 	g_canvas = document.createElement("canvas");
 	g_canvas.className = 'canvas';
+	g_canvas.setAttribute('aria-hidden', true);
+	g_canvas.setAttribute('aria-live', 'off');
 	g_canvas_visible = document.createElement("canvas");
 	g_canvas_visible.className = 'canvas';
+	g_canvas_visible.setAttribute('aria-hidden', true);
+	g_canvas_visible.setAttribute('aria-live', 'off');
 
 	var game = document.getElementById('game');
 	game.appendChild(g_canvas);
