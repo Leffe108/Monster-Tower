@@ -995,3 +995,16 @@ function OnLinkKeypress(e) {
 		return false;
 	}
 }
+
+/**
+ * Set the screen reader-only text which
+ * upon text change will be announced
+ * by screen reader.
+ * Used to inform about what happens in
+ * the game which is otherwise only shown
+ * visually on the canvas.
+ */
+function SetGameAriaLiveText(text) {
+	var element = document.getElementById('game-aria-live-text');
+	element.textContent = text;
+}

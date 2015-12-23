@@ -187,6 +187,7 @@ function Update(time) {
 		g_dirty_screen = true;
 		if (g_logo_timer > 3) {
 			g_logo_timer = -1;
+			SetGameAriaLiveText('Intro is over. Game world now shows and ontop of that a window.');
 			ShowWindow(GetIntroWindow());
 		} else {
 			return; // continue to show logo - don't update game state
@@ -463,7 +464,11 @@ function Init() {
 	InitGUI();
 	LoadGameDefImages();
 
-	if (DISABLE_LOGO_INTRO) SwitchOverlay(OVERLAY_NAV);
+	if (DISABLE_LOGO_INTRO) {
+		SwitchOverlay(OVERLAY_NAV);
+	} else {
+		SetGameAriaLiveText('Game intro: A map of Netherlands is displayed. A small town Monster is shown south-west of The Hague and Amsterdam.');
+	}
 
 	// Cross-browser support for requestAnimationFrame
 	var w = window;

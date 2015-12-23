@@ -1466,6 +1466,19 @@ function OnLinkKeypress(e) {
 	}
 }
 
+/**
+ * Set the screen reader-only text which
+ * upon text change will be announced
+ * by screen reader.
+ * Used to inform about what happens in
+ * the game which is otherwise only shown
+ * visually on the canvas.
+ */
+function SetGameAriaLiveText(text) {
+	var element = document.getElementById('game-aria-live-text');
+	element.textContent = text;
+}
+
 /*
  * Utility functions
  */
@@ -1738,6 +1751,7 @@ function Update(time) {
 		g_dirty_screen = true;
 		if (g_logo_timer > 3) {
 			g_logo_timer = -1;
+			SetGameAriaLiveText('Intro is over. Game world now shows and ontop of that a window.');
 			ShowWindow(GetIntroWindow());
 		} else {
 			return; // continue to show logo - don't update game state
@@ -2014,7 +2028,11 @@ function Init() {
 	InitGUI();
 	LoadGameDefImages();
 
-	if (DISABLE_LOGO_INTRO) SwitchOverlay(OVERLAY_NAV);
+	if (DISABLE_LOGO_INTRO) {
+		SwitchOverlay(OVERLAY_NAV);
+	} else {
+		SetGameAriaLiveText('Game intro: A map of Netherlands is displayed. A small town Monster is shown south-west of The Hague and Amsterdam.');
+	}
 
 	// Cross-browser support for requestAnimationFrame
 	var w = window;
