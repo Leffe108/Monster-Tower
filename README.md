@@ -15,9 +15,13 @@ Key        | Context    | Usage
 -----------|------------|----------
 Tab        | Any        | Moves focus around toobar buttons, window buttons and built rooms/stairs/etc.
 Enter      | Any        | Activate focused button/link.
-Arrow keys | Build&nbsp;room | Moves the place where a new room would be built in the arrow direction. Hold Ctrl to move left/right one room width at the time or 5 floors up/down at the time.
-h,j,k,l    | Build&nbsp;room | Vim movement keys for moving the place where a new room would be built.
-Escape     | Build&nbsp;room | Abort building more rooms of current room type.
+Arrow keys | Build&nbsp;room* | Moves the place where a new room would be built in the arrow direction. Hold Ctrl to move left/right one room width at the time or 5 floors up/down at the time.
+h,j,k,l    | Build&nbsp;room* | Vim movement keys for moving the place where a new room would be built.
+Escape     | Build&nbsp;room* | Abort building more rooms of current room type.
+
+(&#42;) Note: The build room cursor is a focusable element in the tab cycle, and the *build room* keys only function when the cursor has focus.
+
+
 
 # Play it
 http://junctioneer.net/monster-tower/
