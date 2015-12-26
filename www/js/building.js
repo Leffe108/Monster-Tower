@@ -27,6 +27,8 @@ function BuildingInit() {
  */
 function BuildRoom(room_type, floor_num, x) {
 
+	if (!CanBuildRoomHere(room_type, x, floor_num)) return false;
+
 	var floors_container = IsStairLayerRoom(room_type) ? g_stair_floors : g_room_floors;
 	var floor_data = GetFloorData(floors_container, floor_num, true);
 	var room_def = g_room_types[room_type];
