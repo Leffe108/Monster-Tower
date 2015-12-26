@@ -920,6 +920,12 @@ function InitBuildCursor() {
 				e.preventDefault();
 				return;
 
+			case 27: // Escape
+				g_build_cursor_data.room_def = null;
+				SwitchOverlay(OVERLAY_NAV);
+				e.preventDefault();
+				return;
+
 			case 37: // Arrow left
 			case 72: // h
 				d_x--;
