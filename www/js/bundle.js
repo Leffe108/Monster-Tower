@@ -1013,36 +1013,39 @@ function MoveBuildCursor(d_x, d_floor) {
 function SetBuildCursorPosition(x, floor) {
 	var room_width = g_build_cursor_data.room_def.width;
 
-	g_build_cursor_data.x = x;
-	g_build_cursor_data.floor = floor;
-	var screen_pos = MapToScreen(g_build_cursor_data.x, g_build_cursor_data.floor);
+	var screen_pos = MapToScreen(x, floor);
 
 	// Clamp position to be within screen
 	while (screen_pos[0] < 0) {
-		g_build_cursor_data.x++;
-		screen_pos = MapToScreen(g_build_cursor_data.x, g_build_cursor_data.floor);
+		x++;
+		screen_pos = MapToScreen(x, floor);
 	}
 	while (screen_pos[0] + room_width * 16 > g_canvas.width) {
-		g_build_cursor_data.x--;
-		screen_pos = MapToScreen(g_build_cursor_data.x, g_build_cursor_data.floor);
+		x--;
+		screen_pos = MapToScreen(x, floor);
 	}
 	while (screen_pos[1] < 31) { // do not allow positioning on the top toolbar row
-		g_build_cursor_data.floor--;
-		screen_pos = MapToScreen(g_build_cursor_data.x, g_build_cursor_data.floor);
+		floor--;
+		screen_pos = MapToScreen(x, floor);
 	}
 	while (screen_pos[1] + 32 > g_canvas.height) {
-		g_build_cursor_data.floor++
-		screen_pos = MapToScreen(g_build_cursor_data.x, g_build_cursor_data.floor);
+		floor++
+		screen_pos = MapToScreen(x, floor);
 	}
 
-	(function(){
-		var cursor = g_build_cursor_data.dom.cursor;
-		var a = g_build_cursor_data.dom.a;
-		cursor.css('left', screen_pos[0]);
-		cursor.css('top', screen_pos[1]);
-	})();
+	if (x !== g_build_cursor_data.x || floor !== g_build_cursor_data.floor) {
+		g_build_cursor_data.x = x;
+		g_build_cursor_data.floor = floor;
 
-	UpdateBuildCursorCanBuildStatus();
+		(function(){
+			var cursor = g_build_cursor_data.dom.cursor;
+			var a = g_build_cursor_data.dom.a;
+			cursor.css('left', screen_pos[0]);
+			cursor.css('top', screen_pos[1]);
+		})();
+
+		UpdateBuildCursorCanBuildStatus();
+	}
 }
 
 /**
