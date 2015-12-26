@@ -40,19 +40,19 @@
 		<script src="js/jquery-1.11.3.min.js"></script>
 		<div id="game" role="main" aria-live="polite">
 			<h1 class="visually-hidden">Monster Tower</h1>
-			<p class="visually-hidden" aria-live="polite" id="game-aria-live-text"></p>
-			<div id="gui-nav-overlay" class="hidden" aria-live="off">
-				<ul data-nav-type="toolbar"></ul>
-				<ul data-nav-type="room"></ul>
+			<p class="visually-hidden" id="game-aria-live-text"></p>
+			<div id="gui-nav-overlay" class="hidden">
+				<ul data-nav-type="toolbar" role="toolbar"></ul>
+				<ul data-nav-type="room" aria-live="off"></ul>
 			</div>
-			<div id="gui-build-new-overlay" class="hidden" aria-live="off">
-				<div id="gui-build-new-cursor" class="gui-overlay-item">
+			<div id="gui-build-new-overlay" class="hidden">
+				<div id="gui-build-new-cursor" class="gui-overlay-item" role="application">
 					<a tabindex="0"></a>
 				</div>
-				<ul data-nav-type="toolbar"></ul>
+				<ul data-nav-type="toolbar" role="toolbar"></ul>
 			</div>
-			<div id="gui-window-overlay" class="hidden" aria-live="polite"></div>
-			<div id="gui-game-over-overlay" class="hidden" aria-live="off"></div>
+			<div id="gui-window-overlay" class="hidden"></div>
+			<div id="gui-game-over-overlay" class="hidden"></div>
 		</div>
 
 		<!-- Sound effects -->
