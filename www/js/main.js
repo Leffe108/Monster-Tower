@@ -279,10 +279,15 @@ function MapToScreen(x, floor) {
 }
 // return [x, floor] on map
 function ScreenToMap(x, y) {
-	return [
+	var map_pos = [
 		x / 16 - g_view_offset_x,
 		(g_canvas.height - y) / 32 + g_view_offset_floor
 	];
+
+	var int_floor = Math.floor(map_pos[1]);
+	if (map_pos[1] > int_floor) map_pos[1] += 1.0;
+
+	return map_pos;
 }
 function GetSkyColor() {
 	var color_day = [202, 248, 254];
