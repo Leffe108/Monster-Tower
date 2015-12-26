@@ -53,13 +53,14 @@
 }
 
 #gui-build-new-cursor a {
-	border: 1px solid #333;
+	background-color: rgba(0, 0, 0, 0.2);
+	border: 1px dashed #333;
 }
-#gui-build-new-cursor.can-build a {
+#gui-build-new-cursor.can-build a:focus {
 	border: 1px solid blue !important;
 	background-color: rgba(0, 0, 255, 0.3);
 }
-#gui-build-new-cursor.cannot-build a {
+#gui-build-new-cursor.cannot-build a:focus {
 	border: 1px solid red !important;
 	background-color: rgba(255, 0, 0, 0.5) !important;
 }
