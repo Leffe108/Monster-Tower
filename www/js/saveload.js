@@ -54,6 +54,8 @@ function LoadGameStateFromJsonStr(json_str) {
 			return false;
 		}
 
+		RebuildReachableFloors();
+
 		return true;
 	} catch(e) {
 		InitGameState();
