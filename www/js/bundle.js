@@ -44,6 +44,8 @@ function BuildingInit() {
  */
 function BuildRoom(room_type, floor_num, x) {
 
+	if (!CanBuildRoomHere(room_type, x, floor_num)) return false;
+
 	var floors_container = IsStairLayerRoom(room_type) ? g_stair_floors : g_room_floors;
 	var floor_data = GetFloorData(floors_container, floor_num, true);
 	var room_def = g_room_types[room_type];
@@ -531,6 +533,7 @@ function InitGUI() {
 
 	InitGameOverOverlay();
 	InitToolbar();
+	InitBuildCursor();
 }
 
 /**
@@ -549,7 +552,7 @@ function SwitchOverlay(overlay) {
 		$('#gui-nav-overlay').focus();
 	} else if (overlay == OVERLAY_BUILD_NEW) {
 		$('#gui-build-new-overlay').removeClass('hidden');
-		$('#gui-build-new-overlay').focus();
+		$('#gui-build-new-cursor').find('a').focus();
 	} else if (overlay == OVERLAY_GAME_OVER) {
 		$('#gui-game-over-overlay').removeClass('hidden');
 		$('#gui-game-over-overlay a.play-again').focus();
@@ -562,7 +565,7 @@ function SwitchOverlay(overlay) {
  * overlay: 'nav' or 'build-new'
  * nav_type: 
  *   'nav' overlay has: 'room', 'toolbar'
- *   'build-new' overlay has: 'build_new', 'toolbar'
+ *   'build-new' overlay has: 'toolbar'
  */
 function AddOverlayItem(data, title, screen_x, screen_y, screen_width, overlay, nav_type) {
 	var overlay_id = 'gui-' + overlay + '-overlay';
@@ -577,21 +580,6 @@ function AddOverlayItem(data, title, screen_x, screen_y, screen_width, overlay, 
 	} else if (nav_type == 'toolbar') {
 		a.on('click', function() {
 			ToolbarClick(data);
-		});
-	} else if (nav_type == 'build_new') {
-		a.on('click', function() {
-			if (g_bank_balance < data.room_def.buy_cost) {
-				ShowCannotAffordWindow(g_room_types[room_type]);
-				return;
-			}
-			if (BuildRoom(data.room_def.id, data.floor, data.x)) {
-				g_bank_balance -= data.room_def.buy_cost;
-				AnimateCost();
-				PlaySoundEffect('build');
-
-				// Continue to build same type - rebuild DOM overlay
-				RebuildBuildNewOverlay(data.room_def);
-			}
 		});
 	}
 	a.css('width', screen_width + 'px');
@@ -738,44 +726,6 @@ function InitGameOverOverlay() {
 	$('#gui-game-over-overlay').append(a);
 }
 
-/** Adds nav items for places where a room of given type can be placed */
-function RebuildBuildNewOverlay(room_def) {
-
-	$('#gui-build-new-overlay').find('ul[data-nav-type=build_new]').find('li').remove();
-
-	for (var floor_num = MIN_FLOOR; floor_num <= MAX_FLOOR; floor_num++) {
-		if (floor_num === 0 ||
-				(floor_num in g_room_floors) || 
-				((floor_num - 1) in g_room_floors) ||
-				((floor_num + 1) in g_room_floors)) {
-			floor_data = g_room_floors[floor_num];
-
-			var min = ScreenToMap(0, 0);
-			var max = ScreenToMap(g_canvas.width, 0);
-			for (var x = min[0]; x < max[0]; x++) {
-				if (CanBuildRoomHere(room_def.id, x, floor_num)) {
-					var screen_pos = MapToScreen(x, floor_num);
-
-					// Don't add build overlays ontop of toolbar. Cause problems for users
-					// not aware that they can use tab to select the toolbar button overlay.
-					if (screen_pos[1] < 32) continue;
-
-					if (screen_pos[1] >= g_canvas.height) continue;
-
-					var overlay_data = {
-						room_def: room_def,
-						floor: floor_num,
-						x: x,
-					};
-					var width = Math.min(screen_pos[0] + room_def.width * 16, g_canvas.width) - screen_pos[0];
-					AddOverlayItem(overlay_data, 'Build on floor ' + floor_num + ', x: ' + x, 
-							screen_pos[0], screen_pos[1], width, 'build-new', 'build_new');
-				}
-			}
-		}
-	}
-}
-
 /** Rebuilds the nav overlay except for toolbars, use RebuildToolbars for that. */
 function RebuildNavOverlay(room_def) {
 
@@ -879,7 +829,7 @@ function ToolbarClick(toolbar_button) {
 				ShowCannotAffordWindow(g_room_types[room_type]);
 			} else {
 				g_current_build_room_type = g_room_types[room_type];
-				RebuildBuildNewOverlay(g_room_types[room_type]);
+				SetBuildCursorRoomType(g_room_types[room_type]);
 				SwitchOverlay(OVERLAY_BUILD_NEW);
 			}
 			return;
@@ -899,25 +849,26 @@ function ToolbarClick(toolbar_button) {
 			break;
 		case 'view_up':
 			g_view_offset_floor++;
-			if (IsBuildNewOverlayActive()) RebuildBuildNewOverlay(g_current_build_room_type);
+			if (IsBuildNewOverlayActive()) UpdateBuildCursorScreenPosition();
 			RebuildNavOverlay();
 			break;
 		case 'view_down':
 			g_view_offset_floor--;
-			if (IsBuildNewOverlayActive()) RebuildBuildNewOverlay(g_current_build_room_type);
+			if (IsBuildNewOverlayActive()) UpdateBuildCursorScreenPosition();
 			RebuildNavOverlay();
 			break;
 		case 'view_left':
 			g_view_offset_x+= 5;
-			if (IsBuildNewOverlayActive()) RebuildBuildNewOverlay(g_current_build_room_type);
+			if (IsBuildNewOverlayActive()) UpdateBuildCursorScreenPosition();
 			RebuildNavOverlay();
 			break;
 		case 'view_right':
 			g_view_offset_x-= 5;
-			if (IsBuildNewOverlayActive()) RebuildBuildNewOverlay(g_current_build_room_type);
+			if (IsBuildNewOverlayActive()) UpdateBuildCursorScreenPosition();
 			RebuildNavOverlay();
 			break;
 		case 'abort_build_new':
+			g_build_cursor_data.room_def = null;
 			SwitchOverlay(OVERLAY_NAV);
 			break;
 		case 'game_star_level':
@@ -925,6 +876,202 @@ function ToolbarClick(toolbar_button) {
 			break;
 	}
 
+}
+
+/**
+ * App startup initialization of build cursor.
+ *
+ * When starting to build a room type, call SetBuildCursorRoomType to set up the cursor
+ * width and other data specific to each room type.
+ */
+function InitBuildCursor() {
+	var cursor = $('#gui-build-new-cursor');
+	var a = cursor.find('a');
+
+	g_build_cursor_data = {
+		/* Map position of cursor */
+		x: 0,
+		floor: 0,
+
+		room_def: null, // Room def of type to build or null.
+
+		dom: { // DOM elements of the cursor
+			cursor: cursor, // wrapper element
+			a: a,           // link <a>
+		},
+	};
+
+
+	/*
+	 * Arrow keys do not fire keypress on all browsers. So use 'keydown' event rather than 'keypress'
+	 * as not everyone feel at home with hjkl.
+	 */
+	a.on('keydown', function(e) {
+		if (e.which === 13) {
+			this.click();
+			e.preventDefault();
+			return;
+		}
+
+		var d_x = 0; d_floor = 0;
+		switch (e.which) {
+			case 13: // Enter/return
+				this.click();
+				e.preventDefault();
+				return;
+
+			case 37: // Arrow left
+			case 72: // h
+				d_x--;
+				break;
+			case 40: // Arrow down
+			case 74: // j
+				d_floor--;
+				break;
+			case 38: // Arrow up
+			case 75: // k
+				d_floor++;
+				break;
+			case 39: // Arrow right
+			case 76: // l
+				d_x++;
+				break;
+		}
+
+		// Avoid calling preventDefault when modifier key is depressed unless we make use of it.
+		// At least on Chrome this would disable default browser bindings like Ctrl+H => History
+		if (e.ctrlKey) return;
+		if (e.shiftKey) return;
+		if (e.altKey) return;
+
+		if (d_x !== 0 || d_floor !== 0) {
+			MoveBuildCursor(d_x, d_floor);
+			e.preventDefault();
+		}
+	});
+
+	a.on('click', function() {
+		if (g_bank_balance < g_build_cursor_data.room_def.buy_cost) {
+			ShowCannotAffordWindow(g_build_cursor_data.room_def);
+			return;
+		}
+		if (BuildRoom(g_build_cursor_data.room_def.id, g_build_cursor_data.floor, g_build_cursor_data.x)) {
+			g_bank_balance -= g_build_cursor_data.room_def.buy_cost;
+			AnimateCost();
+			PlaySoundEffect('build');
+
+			// Continue to build same room type - update cursor can build status
+			UpdateBuildCursorCanBuildStatus();
+		}
+	});
+
+	$('#gui-build-new-overlay').on('mousemove', function(e) {
+		var offset = $('#gui-build-new-overlay').offset();
+		var canvas_x = e.pageX - offset.left;
+		var canvas_y = e.pageY - offset.top;
+		if (canvas_y <= 32) return; // avoid moving the build cursor ontop of abort build toolbar button.
+		var map_pos = ScreenToMap(canvas_x, canvas_y);
+
+		// Adjust so room center follows mouse pointer.
+		var x = Math.floor(map_pos[0] - (g_build_cursor_data.room_def.width - 0.5) / 2.0);
+		var floor = Math.floor(map_pos[1]);
+
+		SetBuildCursorPosition(x, floor);
+	});
+}
+
+/**
+ * Move build cursor by delta x and delta floor.
+ * @param d_x delta x
+ * @param d_floor delta floor
+ */
+function MoveBuildCursor(d_x, d_floor) {
+	SetBuildCursorPosition(g_build_cursor_data.x + d_x, g_build_cursor_data.floor + d_floor);
+}
+
+/**
+ * Move build cursor to given x and floor. If a position outside of the screen
+ * is given it will be clamped so that the full room is visible within the screen.
+ * @param x the map x coordinate
+ * @param floor the map floor coordinate
+ */
+function SetBuildCursorPosition(x, floor) {
+	var room_width = g_build_cursor_data.room_def.width;
+
+	g_build_cursor_data.x = x;
+	g_build_cursor_data.floor = floor;
+	var screen_pos = MapToScreen(g_build_cursor_data.x, g_build_cursor_data.floor);
+
+	// Clamp position to be within screen
+	while (screen_pos[0] < 0) {
+		g_build_cursor_data.x++;
+		screen_pos = MapToScreen(g_build_cursor_data.x, g_build_cursor_data.floor);
+	}
+	while (screen_pos[0] + room_width * 16 > g_canvas.width) {
+		g_build_cursor_data.x--;
+		screen_pos = MapToScreen(g_build_cursor_data.x, g_build_cursor_data.floor);
+	}
+	while (screen_pos[1] < 31) { // do not allow positioning on the top toolbar row
+		g_build_cursor_data.floor--;
+		screen_pos = MapToScreen(g_build_cursor_data.x, g_build_cursor_data.floor);
+	}
+	while (screen_pos[1] + 32 > g_canvas.height) {
+		g_build_cursor_data.floor++
+		screen_pos = MapToScreen(g_build_cursor_data.x, g_build_cursor_data.floor);
+	}
+
+	(function(){
+		var cursor = g_build_cursor_data.dom.cursor;
+		var a = g_build_cursor_data.dom.a;
+		cursor.css('left', screen_pos[0]);
+		cursor.css('top', screen_pos[1]);
+	})();
+
+	UpdateBuildCursorCanBuildStatus();
+}
+
+/**
+ * Updates build cursor regarding if room can be built at current position.
+ */
+function UpdateBuildCursorCanBuildStatus() {
+	var cursor = g_build_cursor_data.dom.cursor;
+	var a = g_build_cursor_data.dom.a;
+
+	if (CanBuildRoomHere(g_build_cursor_data.room_def.id, g_build_cursor_data.x, g_build_cursor_data.floor)) {
+		cursor.addClass('can-build');
+		cursor.removeClass('cannot-build');
+		a.attr('title', 'Build ' + g_build_cursor_data.room_def.name);
+	} else {
+		cursor.removeClass('can-build');
+		cursor.addClass('cannot-build');
+		a.attr('title', 'Cannot build ' + g_build_cursor_data.room_def.name + ' here');
+	}
+
+}
+
+/**
+ * Updates the position of the build cursor. Eg. after view scroll
+ */
+function UpdateBuildCursorScreenPosition() {
+	SetBuildCursorPosition(g_build_cursor_data.x, g_build_cursor_data.floor);
+}
+
+/**
+ * Set the room type that the build new cursor will build
+ * @param room_def the room definition of the room
+ */
+function SetBuildCursorRoomType(room_def) {
+	g_build_cursor_data.room_def = room_def;
+
+	var cursor = g_build_cursor_data.dom.cursor;
+	var a = g_build_cursor_data.dom.a;
+
+	a.css('width',  (room_def.width * 16) + 'px');
+	var screen_pos = MapToScreen(g_build_cursor_data.x, g_build_cursor_data.floor);
+	cursor.css('left', screen_pos[0]);
+	cursor.css('top', screen_pos[1]);
+
+	UpdateBuildCursorCanBuildStatus();
 }
 
 function ShowCannotAffordWindow(room_def) {
@@ -1577,7 +1724,7 @@ var g_animations = null;
 var g_open_windows = null; // gui open windows
 var g_hovered_overlay_item = null; // null or object with keys 'screen_x', 'screen_y' and 'data'.
 var g_toolbar_buildable_rooms = null; // array of rooms that can currently be built. The order affects toolbars
-var g_current_build_room_type = null; // null or the room type selected for build
+var g_build_cursor_data = null; // object with data for the build new room cursor
 var g_simulation_time = null; // unit: minutes (total 24*60 a day)
 var g_simulation_day = null; // day counter
 var g_game_win_lose = null; // WL_* from game_level.js
@@ -1627,7 +1774,7 @@ function InitCanvas() {
 		ResizeCanvas();
 		PositionWindows();
 		RebuildToolbars();
-		if (IsBuildNewOverlayActive()) RebuildBuildNewOverlay(g_current_build_room_type);
+		if (IsBuildNewOverlayActive()) UpdateBuildCursorScreenPosition();
 		RebuildNavOverlay();
 	}
 }
@@ -1843,10 +1990,15 @@ function MapToScreen(x, floor) {
 }
 // return [x, floor] on map
 function ScreenToMap(x, y) {
-	return [
+	var map_pos = [
 		x / 16 - g_view_offset_x,
 		(g_canvas.height - y) / 32 + g_view_offset_floor
 	];
+
+	var int_floor = Math.floor(map_pos[1]);
+	if (map_pos[1] > int_floor) map_pos[1] += 1.0;
+
+	return map_pos;
 }
 function GetSkyColor() {
 	var color_day = [202, 248, 254];

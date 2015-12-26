@@ -8,7 +8,15 @@ Monster Tower is a game inspired by Sim Tower.
 In the Netherlands there is a town called Monster. It want to show how much better it is there compared to its neighbours. So they decide to build a tall tower. Your job is to build that tower.
 
 # Contorls
-The game can be played using mouse (left button) or keyboard (tab + enter).
+The game can be played using mouse (left button) or keyboard
+
+## Keyboard controls
+Key        | Context    | Usage
+-----------------------------------
+Tab        | Any        | Moves focus around toobar buttons, window buttons and built rooms/stairs/etc.
+Enter      | Any        | Activate focused button/link.
+Arrow keys | Build room | Moves the place where a new room would be built in the arrow direction.
+h,j,k,l    | Build room | Vim movement keys for moving the place where a new room would be built.
 
 # Play it
 http://junctioneer.net/monster-tower/

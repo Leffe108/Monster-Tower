@@ -13,7 +13,7 @@ var g_animations = null;
 var g_open_windows = null; // gui open windows
 var g_hovered_overlay_item = null; // null or object with keys 'screen_x', 'screen_y' and 'data'.
 var g_toolbar_buildable_rooms = null; // array of rooms that can currently be built. The order affects toolbars
-var g_current_build_room_type = null; // null or the room type selected for build
+var g_build_cursor_data = null; // object with data for the build new room cursor
 var g_simulation_time = null; // unit: minutes (total 24*60 a day)
 var g_simulation_day = null; // day counter
 var g_game_win_lose = null; // WL_* from game_level.js
@@ -63,7 +63,7 @@ function InitCanvas() {
 		ResizeCanvas();
 		PositionWindows();
 		RebuildToolbars();
-		if (IsBuildNewOverlayActive()) RebuildBuildNewOverlay(g_current_build_room_type);
+		if (IsBuildNewOverlayActive()) UpdateBuildCursorScreenPosition();
 		RebuildNavOverlay();
 	}
 }

@@ -52,6 +52,18 @@
 	background-color: rgba(0, 0, 255, 0.3);
 }
 
+#gui-build-new-cursor a {
+	border: 1px solid #333;
+}
+#gui-build-new-cursor.can-build a {
+	border: 1px solid blue !important;
+	background-color: rgba(0, 0, 255, 0.3);
+}
+#gui-build-new-cursor.cannot-build a {
+	border: 1px solid red !important;
+	background-color: rgba(255, 0, 0, 0.5) !important;
+}
+
 /* Game over overlay */
 #gui-game-over-overlay a.play-again {
 	position: absolute;
