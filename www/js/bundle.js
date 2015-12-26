@@ -938,9 +938,18 @@ function InitBuildCursor() {
 				break;
 		}
 
+		var ctrl_use = false;
+
+		// Move a whole room at the time if Ctrl key is depressed while using one of the arrow keys
+		if (e.ctrlKey && [37, 40, 38, 39].indexOf(e.which) !== -1) {
+			d_x *= g_build_cursor_data.room_def.width;
+			d_floor *= 5;
+			ctrl_use = true;
+		}
+
 		// Avoid calling preventDefault when modifier key is depressed unless we make use of it.
 		// At least on Chrome this would disable default browser bindings like Ctrl+H => History
-		if (e.ctrlKey) return;
+		if (!ctrl_use && e.ctrlKey) return;
 		if (e.shiftKey) return;
 		if (e.altKey) return;
 
