@@ -12,12 +12,12 @@ The game can be played using mouse (left button) or keyboard
 
 ## Keyboard controls
 Key        | Context    | Usage
------------------------------------
+-----------|------------|----------
 Tab        | Any        | Moves focus around toobar buttons, window buttons and built rooms/stairs/etc.
 Enter      | Any        | Activate focused button/link.
-Arrow keys | Build room | Moves the place where a new room would be built in the arrow direction. Hold Ctrl to move left/right one room width at the time or 5 floors up/down at the time.
-h,j,k,l    | Build room | Vim movement keys for moving the place where a new room would be built.
-Escape     | Build room | Abort building more rooms of current room type.
+Arrow keys | Build&nbsp;room | Moves the place where a new room would be built in the arrow direction. Hold Ctrl to move left/right one room width at the time or 5 floors up/down at the time.
+h,j,k,l    | Build&nbsp;room | Vim movement keys for moving the place where a new room would be built.
+Escape     | Build&nbsp;room | Abort building more rooms of current room type.
 
 # Play it
 http://junctioneer.net/monster-tower/
