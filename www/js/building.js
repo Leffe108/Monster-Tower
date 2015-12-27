@@ -109,31 +109,7 @@ function CanBuildRoomHere(room_type, x, floor_num) {
 		if ((floor_num - 1) in g_room_floors) {
 			var floor_below_data = g_room_floors[floor_num-1];
 
-			return DoesRoomsCoverXArea(floor_below_data, x, room_def.width)
-/*
-			// List of x coords that the new room will occupy
-			var has_support = {};
-			for (var i = 0; i < room_def.width; i++) {
-				has_support[x + i] = false;
-			}
-
-			// Set x coords of new room to true if there is a room part
-			// exactly below it.
-			for (var i = 0; i < floor_below_data.length; i++) {
-				
-				for (var room_i_x = 0; room_i_x < floor_below_data[i].width; room_i_x++) {
-					var support_x = floor_below_data[i].x + room_i_x;
-					if (support_x in has_support) has_support[support_x] = true;
-				}
-			}
-
-			// Check that all room parts are true
-			for (support_x in has_support) {
-				if (has_support[support_x] === false) return false;
-			}
-
-			// has support!
-			return true;*/
+			return DoesRoomsCoverXArea(floor_below_data, x, room_def.width);
 		} else {
 			// no roomes on current or floor below
 			return false;
