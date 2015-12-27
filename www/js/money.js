@@ -46,10 +46,10 @@ var Money = (function() {
 	};
 
 	var animateCost = function () {
-		g_animations.push(new Animation('cost', g_canvas.width - 64, g_canvas.height - 32));
+		Animation.create('cost', g_canvas.width - 64, g_canvas.height - 32);
 	};
 	var animateIncome = function() {
-		g_animations.push(new Animation('money', g_canvas.width - 64, g_canvas.height - 32));
+		Animation.create('money', g_canvas.width - 64, g_canvas.height - 32);
 	};
 
 	// Export:

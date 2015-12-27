@@ -9,7 +9,6 @@ var g_context = null;
 var g_dirty_screen = null; // needs redraw? true/false
 var g_logo_timer = null;
 var g_images = null;
-var g_animations = null;
 var g_open_windows = null; // gui open windows
 var g_hovered_overlay_item = null; // null or object with keys 'screen_x', 'screen_y' and 'data'.
 var g_toolbar_buildable_rooms = null; // array of rooms that can currently be built. The order affects toolbars
@@ -224,12 +223,12 @@ function Update(time) {
 		g_dirty_screen = true;
 	}
 
-	if (g_animations.length > 0) {
+	if (Animation.hasAny()) {
 		g_dirty_screen = true;
 	}
 
 	// Always update GUI
-	UpdateAnimations(gui_time);
+	Animation.updateAll(gui_time);
 	UpdateWindows(gui_time);
 }
 
@@ -421,7 +420,7 @@ function Render() {
 	DrawToolbar();
 
 	// Draw animations
-	DrawAnimations();
+	Animation.drawAll();
 
 	// Current time & speed
 	g_context.fillStyle = "rgb(255, 255, 255)";
@@ -466,6 +465,7 @@ function Init() {
 	InitCanvas();
 	LoadImages();
 	InitGameState();
+	Animation.init();
 	InitGUI();
 	LoadGameDefImages();
 

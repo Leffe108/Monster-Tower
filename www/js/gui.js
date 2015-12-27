@@ -12,51 +12,9 @@ var OVERLAY_WINDOWS = 3;
 var OVERLAY_GAME_OVER = 4;
 
 /**
- * Creates an animation.
- *
- * Animations for now is moving an image upwards while rotating it.
- */
-function Animation(image, start_x, start_y) {
-	this.x = start_x;
-	this.y = start_y;
-	this.angle = 0;
-	this.image = image;
-	this.timer = 0;
-}
-
-function UpdateAnimations(time) {
-	for (var i = 0; i < g_animations.length; i++) {
-		var animation = g_animations[i];
-		animation.timer += time;
-		if (animation.timer > ANIMATION_MAX_TIME) {
-			g_animations.splice(i, 1);
-			i--;
-		} else {
-			var N_ROTATIONS = 0.75;
-			animation.y -= time * 15.0;
-			animation.angle = animation.timer * N_ROTATIONS * Math.PI*2 / ANIMATION_MAX_TIME;
-		}
-	}
-}
-
-/**
- * Draws all Animations
- */
-function DrawAnimations() {
-	for (var i = 0; i < g_animations.length; i++) {
-		var animation = g_animations[i];
-		var start_alpha = 0.5;
-		g_context.globalAlpha = start_alpha * (ANIMATION_MAX_TIME - animation.timer) / (ANIMATION_MAX_TIME);
-		DrawImage(animation.image, animation.x, animation.y, animation.angle);
-		g_context.globalAlpha = 1.0;
-	}
-}
-
-/**
  * Initialize GUI-related stuff
  */
 function InitGUI() {
-	g_animations = [];
 	g_open_windows = [];
 
 	InitGameOverOverlay();
