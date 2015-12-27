@@ -8,7 +8,6 @@ var g_view_offset_x = null;
 var g_context = null;
 var g_dirty_screen = null; // needs redraw? true/false
 var g_logo_timer = null;
-var g_hovered_overlay_item = null; // null or object with keys 'screen_x', 'screen_y' and 'data'.
 var g_toolbar_buildable_rooms = null; // array of rooms that can currently be built. The order affects toolbars
 var g_build_cursor_data = null; // object with data for the build new room cursor
 var g_simulation_time = null; // unit: minutes (total 24*60 a day)
@@ -60,7 +59,7 @@ function InitCanvas() {
 		ResizeCanvas();
 		Gui.positionWindows();
 		Gui.rebuildToolbars();
-		if (Gui.sBuildNewOverlayActive()) Gui.updateBuildCursorScreenPosition();
+		if (Gui.isBuildNewOverlayActive()) Gui.updateBuildCursorScreenPosition();
 		Gui.rebuildNavOverlay();
 	}
 }
@@ -311,16 +310,7 @@ function Render() {
 		}
 	}
 
-	// Draw build hover
-	if (g_hovered_overlay_item !== null &&
-			('room_def' in g_hovered_overlay_item) // toolbar buttons can exist in build mode as overlay items, but they don't have a room def
-			&& Gui.isBuildNewOverlayActive()) {
-		var room_def = g_hovered_overlay_item.room_def;
-		var y_offset = room_def.id === 'stair' ? -16 : 0;
-		var screen_pos = MapToScreen(g_hovered_overlay_item.x, g_hovered_overlay_item.floor);
-		MtImage.draw(room_def.image, screen_pos[0], screen_pos[1] + y_offset);
-	}
-
+	Gui.drawBuildCursor();
 	Gui.drawToolbar();
 
 	// Draw animations

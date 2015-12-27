@@ -71,16 +71,6 @@ var Gui = (function() {
 		}
 		a.css('width', screen_width + 'px');
 		a.on('keypress', onLinkKeypress);
-		a.on('mouseover', function() {
-			g_hovered_overlay_item = data;
-		});
-		a.on('mouseout', function() {
-			if (g_hovered_overlay_item !== null &&
-					g_hovered_overlay_item.screen_x === screen_x &&
-					g_hovered_overlay_item.screen_y === screen_y) {
-				g_hovered_overlay_item = null;
-			}
-		});
 		a.attr('title', title);
 		li.css('left', screen_x);
 		li.css('top', screen_y);
@@ -381,8 +371,9 @@ var Gui = (function() {
 			floor: 0,
 
 			room_def: null, // Room def of type to build or null.
+			can_build: false, // True if room can be built at current cursor position, otherwise false.
 
-			dom: { // DOM elements of the cursor
+			dom: { // DOM elements of the cursor. Note: these are actually jQuery objcets.
 				cursor: cursor, // wrapper element
 				a: a,           // link <a>
 			},
@@ -482,6 +473,16 @@ var Gui = (function() {
 		});
 	};
 
+	var drawBuildCursor = function() {
+		if (g_build_cursor_data.room_def !== null && g_build_cursor_data.can_build) {
+			/* Draw room at cursor position. */
+			var room_def = g_build_cursor_data.room_def;
+			var screen_pos = MapToScreen(g_build_cursor_data.x, g_build_cursor_data.floor);
+			var y_offset = room_def.id === 'stair' ? -16 : 0;
+			MtImage.draw(room_def.image, screen_pos[0], screen_pos[1] + y_offset);
+		}
+	}
+
 	/**
 	 * Move build cursor by delta x and delta floor.
 	 * @param d_x delta x
@@ -542,7 +543,8 @@ var Gui = (function() {
 		var cursor = g_build_cursor_data.dom.cursor;
 		var a = g_build_cursor_data.dom.a;
 
-		if (Building.canBuildRoomHere(g_build_cursor_data.room_def.id, g_build_cursor_data.x, g_build_cursor_data.floor)) {
+		g_build_cursor_data.can_build = Building.canBuildRoomHere(g_build_cursor_data.room_def.id, g_build_cursor_data.x, g_build_cursor_data.floor);
+		if (g_build_cursor_data.can_build) {
 			cursor.addClass('can-build');
 			cursor.removeClass('cannot-build');
 			a.attr('title', 'Build ' + g_build_cursor_data.room_def.name);
@@ -1131,6 +1133,7 @@ var Gui = (function() {
 		/* functions */
 		init: init,
 		switchOverlay: switchOverlay,
+		drawBuildCursor: drawBuildCursor,
 		drawToolbar: drawToolbar,
 		addOverlayItem: addOverlayItem,
 		removeOverlayItem: removeOverlayItem,
