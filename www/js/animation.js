@@ -3,6 +3,7 @@
  */
 var Animation = (function() {
 
+	var _ANIMATION_MAX_TIME = 2.0;
 	var _animations = null;
 
 	var init = function() {
@@ -32,13 +33,13 @@ var Animation = (function() {
 		for (var i = 0; i < _animations.length; i++) {
 			var animation = _animations[i];
 			animation.timer += time;
-			if (animation.timer > ANIMATION_MAX_TIME) {
+			if (animation.timer > _ANIMATION_MAX_TIME) {
 				_animations.splice(i, 1);
 				i--;
 			} else {
 				var N_ROTATIONS = 0.75;
 				animation.y -= time * 15.0;
-				animation.angle = animation.timer * N_ROTATIONS * Math.PI*2 / ANIMATION_MAX_TIME;
+				animation.angle = animation.timer * N_ROTATIONS * Math.PI*2 / _ANIMATION_MAX_TIME;
 			}
 		}
 	};
@@ -57,7 +58,7 @@ var Animation = (function() {
 		for (var i = 0; i < _animations.length; i++) {
 			var animation = _animations[i];
 			var start_alpha = 0.5;
-			g_context.globalAlpha = start_alpha * (ANIMATION_MAX_TIME - animation.timer) / (ANIMATION_MAX_TIME);
+			g_context.globalAlpha = start_alpha * (_ANIMATION_MAX_TIME - animation.timer) / (_ANIMATION_MAX_TIME);
 			DrawImage(animation.image, animation.x, animation.y, animation.angle);
 			g_context.globalAlpha = 1.0;
 		}

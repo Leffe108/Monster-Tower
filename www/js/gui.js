@@ -2,8 +2,6 @@
  * GUI related stuff
  */
 
-var ANIMATION_MAX_TIME = 2.0;
-
 var BOTTOM_WINDOW_Z = 10; ///< z-index of the window displayed at the bottom of the open window stack.
 
 var OVERLAY_NAV = 1;   // toolbar + click on rooms
