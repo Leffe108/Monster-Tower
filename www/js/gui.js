@@ -500,7 +500,7 @@ function InitBuildCursor() {
 		}
 		if (BuildRoom(g_build_cursor_data.room_def.id, g_build_cursor_data.floor, g_build_cursor_data.x)) {
 			g_bank_balance -= g_build_cursor_data.room_def.buy_cost;
-			AnimateCost();
+			Money.animateCost();
 			PlaySoundEffect('build');
 
 			// Continue to build same room type - update cursor can build status
@@ -1101,7 +1101,7 @@ function WidgetAction(w, widget_name, widget_type) {
 		case 'room':
 			switch (widget_name) {
 				case 'demolish':
-					if (TryBuy(w.room.def.demolish_cost)) {
+					if (Money.tryBuy(w.room.def.demolish_cost)) {
 						DemolishRoom(w.room);
 						CloseTopWindow();
 					}

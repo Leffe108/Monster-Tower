@@ -169,7 +169,7 @@ function InitGameState()
 	g_game_paused = true;
 
 	GameLevelInit();
-	MoneyInit();
+	Money.init();
 	RoomTypeInit();
 	BuildingInit();
 }
@@ -215,7 +215,7 @@ function Update(time) {
 		}
 
 		UpdateRooms(time);
-		UpdateMoney(time);
+		Money.update(time);
 		UpdateGameLevel(time);
 
 		g_dirty_screen = true;
