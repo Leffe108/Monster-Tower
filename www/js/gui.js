@@ -243,7 +243,7 @@ var Gui = (function() {
 	var drawToolbar = function() {
 		var x = 0;
 		var y = 0;
-		if (IsNavOverlayActive()) {
+		if (isNavOverlayActive()) {
 			DrawImage('help', x, y, 0);
 			x += 32;
 			DrawImage('load', x, y, 0);

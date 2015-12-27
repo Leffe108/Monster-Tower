@@ -432,9 +432,6 @@ function Render() {
 	g_context.textAlign = "right";
 	g_context.fillText(MoneyStr(g_bank_balance), g_canvas.width - 4, g_canvas.height - 4);
 
-	// Draw GUI
-	DrawWindows();
-
 	// Last, swap visible buffer
 	SwapCanvas();
 }
