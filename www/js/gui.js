@@ -275,7 +275,7 @@ function RebuildNavOverlay(room_def) {
 					// not aware that they can use tab to select the toolbar button overlay.
 					if (screen_pos[1] < 32) continue;
 
-					AddOverlayItemForRoom(room_data);
+					Building.addOverlayItemForRoom(room_data);
 				}
 			}
 		}
@@ -498,7 +498,7 @@ function InitBuildCursor() {
 			ShowCannotAffordWindow(g_build_cursor_data.room_def);
 			return;
 		}
-		if (BuildRoom(g_build_cursor_data.room_def.id, g_build_cursor_data.floor, g_build_cursor_data.x)) {
+		if (Building.buildRoom(g_build_cursor_data.room_def.id, g_build_cursor_data.floor, g_build_cursor_data.x)) {
 			g_bank_balance -= g_build_cursor_data.room_def.buy_cost;
 			Money.animateCost();
 			PlaySoundEffect('build');
@@ -583,7 +583,7 @@ function UpdateBuildCursorCanBuildStatus() {
 	var cursor = g_build_cursor_data.dom.cursor;
 	var a = g_build_cursor_data.dom.a;
 
-	if (CanBuildRoomHere(g_build_cursor_data.room_def.id, g_build_cursor_data.x, g_build_cursor_data.floor)) {
+	if (Building.canBuildRoomHere(g_build_cursor_data.room_def.id, g_build_cursor_data.x, g_build_cursor_data.floor)) {
 		cursor.addClass('can-build');
 		cursor.removeClass('cannot-build');
 		a.attr('title', 'Build ' + g_build_cursor_data.room_def.name);
@@ -731,7 +731,7 @@ function GetGameStarLevelWindow() {
 			w.widgets.push(new WidSpacer());
 			w.widgets.push(new WidSpacer());
 			w.widgets.push(new WidLabel(req_next_star_str, 'left'));
-			w.widgets.push(new WidValue("Number of floors", GetBuildingHeight() + ' / ' + GameLevel.STAR2_MIN_FLOORS));
+			w.widgets.push(new WidValue("Number of floors", Building.getBuildingHeight() + ' / ' + GameLevel.STAR2_MIN_FLOORS));
 			w.widgets.push(new WidValue("Rented offices", GetRoomRentedCount('office') + ' / ' + GameLevel.STAR2_MIN_OFFICE_RENTED));
 			w.widgets.push(new WidValue("Rented cafeteria", GetRoomRentedCount('cafeteria') + ' / ' + GameLevel.STAR2_MIN_CAFETERIA));
 			break;
@@ -739,7 +739,7 @@ function GetGameStarLevelWindow() {
 			w.widgets.push(new WidSpacer());
 			w.widgets.push(new WidSpacer());
 			w.widgets.push(new WidLabel(req_next_star_str, 'left'));
-			w.widgets.push(new WidValue("Number of floors", GetBuildingHeight() + ' / ' + GameLevel.STAR3_MIN_FLOORS));
+			w.widgets.push(new WidValue("Number of floors", Building.getBuildingHeight() + ' / ' + GameLevel.STAR3_MIN_FLOORS));
 			w.widgets.push(new WidValue("Rented offices", GetRoomRentedCount('office') + ' / ' + GameLevel.STAR3_MIN_OFFICE_RENTED));
 			w.widgets.push(new WidValue("Rented cafeteria", GetRoomRentedCount('cafeteria') + ' / ' + GameLevel.STAR3_MIN_CAFETERIA));
 			w.widgets.push(new WidValue("Rented flower shops", GetRoomRentedCount('flower-shop') + ' / ' + GameLevel.STAR3_MIN_FLOWER_SHOP));
@@ -748,7 +748,7 @@ function GetGameStarLevelWindow() {
 			w.widgets.push(new WidSpacer());
 			w.widgets.push(new WidSpacer());
 			w.widgets.push(new WidLabel('To win the game: [you have / you need]', 'left'));
-			w.widgets.push(new WidValue("Number of floors", GetBuildingHeight() + ' / ' + GameLevel.WIN_GAME_MIN_FLOORS));
+			w.widgets.push(new WidValue("Number of floors", Building.getBuildingHeight() + ' / ' + GameLevel.WIN_GAME_MIN_FLOORS));
 			break;
 	}
 	w.widgets.push(new WidClose());
@@ -1102,7 +1102,7 @@ function WidgetAction(w, widget_name, widget_type) {
 			switch (widget_name) {
 				case 'demolish':
 					if (Money.tryBuy(w.room.def.demolish_cost)) {
-						DemolishRoom(w.room);
+						Building.demolishRoom(w.room);
 						CloseTopWindow();
 					}
 					break;

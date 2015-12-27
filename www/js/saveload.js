@@ -56,7 +56,7 @@ var SaveLoad = (function() {
 				return false;
 			}
 
-			RebuildReachableFloors();
+			Building.rebuildReachableFloors();
 
 			return true;
 		} catch(e) {

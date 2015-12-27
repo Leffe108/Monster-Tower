@@ -171,7 +171,7 @@ function InitGameState()
 	GameLevel.init();
 	Money.init();
 	RoomTypeInit();
-	BuildingInit();
+	Building.init();
 }
 
 /**
@@ -428,7 +428,7 @@ function Render() {
 	g_context.font = "14px Verdana";
 	g_context.textAlign = "left";
 	g_context.textBaseline = "bottom";
-	g_context.fillText("day: " + g_simulation_day + "  time: " + TimeStr(g_simulation_time) + " " + (g_game_paused ? ' paused ' : '') + ' ' + GetBuildingHeight() + ' floors', 4, g_canvas.height - 4);
+	g_context.fillText("day: " + g_simulation_day + "  time: " + TimeStr(g_simulation_time) + " " + (g_game_paused ? ' paused ' : '') + ' ' + Building.getBuildingHeight() + ' floors', 4, g_canvas.height - 4);
 
 	// Bank balance
 	g_context.textAlign = "right";

@@ -53,7 +53,7 @@ var GameLevel = (function() {
 		}
 
 		if (g_game_win_lose > GWL_GAME_OVER) {
-			if (GetBuildingHeight() >= WIN_GAME_MIN_FLOORS) {
+			if (Building.getBuildingHeight() >= WIN_GAME_MIN_FLOORS) {
 				g_game_win_lose = GWL_WON;
 			}
 		}
@@ -68,7 +68,7 @@ var GameLevel = (function() {
 			case GSL_STAR1:
 				if (GetRoomRentedCount('office') >= STAR2_MIN_OFFICE_RENTED &&
 						GetRoomRentedCount('cafeteria') >= STAR2_MIN_CAFETERIA &&
-						GetBuildingHeight() >= STAR2_MIN_FLOORS) {
+						Building.getBuildingHeight() >= STAR2_MIN_FLOORS) {
 					_setGameStarLevel(g_game_star_level + 1);
 				}
 				break;
@@ -76,7 +76,7 @@ var GameLevel = (function() {
 				if (GetRoomRentedCount('office') >= STAR3_MIN_OFFICE_RENTED &&
 						GetRoomRentedCount('cafeteria') >= STAR3_MIN_CAFETERIA &&
 						GetRoomRentedCount('flower-shop') >= STAR3_MIN_FLOWER_SHOP &&
-						GetBuildingHeight() >= STAR3_MIN_FLOORS) {
+						Building.getBuildingHeight() >= STAR3_MIN_FLOORS) {
 					_setGameStarLevel(g_game_star_level + 1);
 				}
 				break;
