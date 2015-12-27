@@ -8,7 +8,6 @@ var g_view_offset_x = null;
 var g_context = null;
 var g_dirty_screen = null; // needs redraw? true/false
 var g_logo_timer = null;
-var g_open_windows = null; // gui open windows
 var g_hovered_overlay_item = null; // null or object with keys 'screen_x', 'screen_y' and 'data'.
 var g_toolbar_buildable_rooms = null; // array of rooms that can currently be built. The order affects toolbars
 var g_build_cursor_data = null; // object with data for the build new room cursor

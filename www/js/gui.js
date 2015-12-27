@@ -10,11 +10,13 @@ var Gui = (function() {
 	var OVERLAY_WINDOWS = 3;
 	var OVERLAY_GAME_OVER = 4;
 
+	var _open_windows = [];
+
 	/**
 	 * Initialize GUI-related stuff
 	 */
 	var init = function() {
-		g_open_windows = [];
+		_open_windows = [];
 
 		initGameOverOverlay();
 		initToolbar();
@@ -587,7 +589,7 @@ var Gui = (function() {
 	 * Is the intro window open?
 	 */
 	var isIntroWindowOpen = function() {
-		return g_open_windows.length > 0 && g_open_windows[0].type === 'intro';
+		return _open_windows.length > 0 && _open_windows[0].type === 'intro';
 	};
 	/**
 	 * Is the game over overlay active?
@@ -603,7 +605,7 @@ var Gui = (function() {
 	};
 
 	var hasOpenWindows = function() {
-		return g_open_windows.length > 0;
+		return _open_windows.length > 0;
 	};
 
 	/**
@@ -819,22 +821,22 @@ var Gui = (function() {
 	 * Show a window
 	 */
 	var showWindow = function(w) {
-		if (g_open_windows.length == 0) {
+		if (_open_windows.length == 0) {
 			switchOverlay(OVERLAY_WINDOWS);
 		}
 		renderWindowHtml(w);
 		positionWindows();
-		g_open_windows.push(w);
+		_open_windows.push(w);
 	};
 
 	/**
 	 * Close topmost window
 	 */
 	var closeTopWindow = function() {
-		if (g_open_windows.length == 0) return;
-		$(g_open_windows[g_open_windows.length-1].dom_node).remove();
-		g_open_windows.pop();
-		if (g_open_windows.length == 0) {
+		if (_open_windows.length == 0) return;
+		$(_open_windows[_open_windows.length-1].dom_node).remove();
+		_open_windows.pop();
+		if (_open_windows.length == 0) {
 			switchOverlay(OVERLAY_NAV);
 		}
 	};
@@ -916,8 +918,8 @@ var Gui = (function() {
 
 		$(window_div).children('.wid-close').children('.close').on('click', function() {
 			$(this).parent().parent().remove();
-			g_open_windows.pop();
-			if (g_open_windows.length == 0) {
+			_open_windows.pop();
+			if (_open_windows.length == 0) {
 				switchOverlay(OVERLAY_NAV);
 			}
 		});
@@ -930,7 +932,7 @@ var Gui = (function() {
 
 		// Make new window appear ontop of any existing window
 		// on screen.
-		$(window_div).css('z-index', BOTTOM_WINDOW_Z + g_open_windows.length);
+		$(window_div).css('z-index', BOTTOM_WINDOW_Z + _open_windows.length);
 
 		var overlay = document.getElementById('gui-window-overlay');
 		overlay.appendChild(window_div);
