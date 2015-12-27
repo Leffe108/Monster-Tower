@@ -70,7 +70,7 @@ var Building = (function() {
 		var screen_pos = MapToScreen(room_data.x, room_data.floor);
 		if (screen_pos[1] >= g_canvas.height) return;
 		var width = Math.min(screen_pos[0] + room_data.width * 16, g_canvas.width) - screen_pos[0];
-		room_data.overlay_item = AddOverlayItem(room_data, room_data.def.name, screen_pos[0], screen_pos[1], width, 'nav', 'room');
+		room_data.overlay_item = addOverlayItem(room_data, room_data.def.name, screen_pos[0], screen_pos[1], width, 'nav', 'room');
 	};
 
 	/**
@@ -87,7 +87,7 @@ var Building = (function() {
 				floor_data.splice(i, 1);
 
 				var screen_pos = MapToScreen(room_instance.x, room_instance.floor_num);
-				RemoveOverlayItem(room_instance.overlay_item);
+				Gui.removeOverlayItem(room_instance.overlay_item);
 				if (RoomType.isStairLayerRoom(room_instance.def.id)) rebuildReachableFloors();
 				return;
 			}

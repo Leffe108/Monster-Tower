@@ -92,7 +92,7 @@ var GameLevel = (function() {
 		var stars = g_game_star_level;
 		var s = stars >= 2 || stars === 0 ? 's' : '';
 		if (stars > 0) {
-			ShowWindow(GetMessageWindow('You leveled up!', ['Your monster tower now have ' + stars + ' star' + s]));
+			Gui.showWindow(Gui.getMessageWindow('You leveled up!', ['Your monster tower now have ' + stars + ' star' + s]));
 			PlaySoundEffect('new-star');
 		}
 

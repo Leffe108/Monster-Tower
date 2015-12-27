@@ -60,10 +60,10 @@ function InitCanvas() {
 
 	window.onresize = function() {
 		ResizeCanvas();
-		PositionWindows();
-		RebuildToolbars();
-		if (IsBuildNewOverlayActive()) UpdateBuildCursorScreenPosition();
-		RebuildNavOverlay();
+		Gui.positionWindows();
+		Gui.rebuildToolbars();
+		if (Gui.sBuildNewOverlayActive()) Gui.updateBuildCursorScreenPosition();
+		Gui.rebuildNavOverlay();
 	}
 }
 
@@ -186,8 +186,8 @@ function Update(time) {
 		g_dirty_screen = true;
 		if (g_logo_timer > 3) {
 			g_logo_timer = -1;
-			SetGameAriaLiveText('Intro is over. Game world now shows and ontop of that a window.');
-			ShowWindow(GetIntroWindow());
+			Gui.setGameAriaLiveText('Intro is over. Game world now shows and ontop of that a window.');
+			Gui.showWindow(Gui.getIntroWindow());
 		} else {
 			return; // continue to show logo - don't update game state
 		}
@@ -195,8 +195,8 @@ function Update(time) {
 
 	// If game was just lost, enable click detection on game over
 	// screen to reload game.
-	if ((GameLevel.isGameOver() || GameLevel.isGameWon()) && !IsGameOverOverlayActive()) {
-		while (HasOpenWindows()) CloseTopWindow();
+	if ((GameLevel.isGameOver() || GameLevel.isGameWon()) && !Gui.isGameOverOverlayActive()) {
+		while (Gui.hasOpenWindows()) Gui.closeTopWindow();
 		SwitchOverlay(OVERLAY_GAME_OVER);
 		g_dirty_screen = true;
 	}
@@ -205,7 +205,7 @@ function Update(time) {
 	// - pause when window is open, as many display stats that don't update unless the
 	//   window is re-opened.
 	var old_paused = g_game_paused;
-	g_game_paused = IsIntroWindowOpen() || HasOpenWindows() || GameLevel.isGameOver() || GameLevel.isGameWon();
+	g_game_paused = Gui.isIntroWindowOpen() || Gui.hasOpenWindows() || GameLevel.isGameOver() || GameLevel.isGameWon();
 	if (!g_game_paused) {
 		g_simulation_time += time; // one second = one in-game minute
 		while (g_simulation_time > 24 * 60) {
@@ -229,7 +229,6 @@ function Update(time) {
 
 	// Always update GUI
 	Animation.updateAll(gui_time);
-	UpdateWindows(gui_time);
 }
 
 /**
@@ -410,14 +409,14 @@ function Render() {
 	// Draw build hover
 	if (g_hovered_overlay_item !== null &&
 			('room_def' in g_hovered_overlay_item) // toolbar buttons can exist in build mode as overlay items, but they don't have a room def
-			&& IsBuildNewOverlayActive()) {
+			&& Gui.isBuildNewOverlayActive()) {
 		var room_def = g_hovered_overlay_item.room_def;
 		var y_offset = room_def.id === 'stair' ? -16 : 0;
 		var screen_pos = MapToScreen(g_hovered_overlay_item.x, g_hovered_overlay_item.floor);
 		DrawImage(room_def.image, screen_pos[0], screen_pos[1] + y_offset);
 	}
 
-	DrawToolbar();
+	Gui.drawToolbar();
 
 	// Draw animations
 	Animation.drawAll();
@@ -466,13 +465,13 @@ function Init() {
 	LoadImages();
 	InitGameState();
 	Animation.init();
-	InitGUI();
+	Gui.init();
 	LoadGameDefImages();
 
 	if (DISABLE_LOGO_INTRO) {
-		SwitchOverlay(OVERLAY_NAV);
+		Gui.switchOverlay(OVERLAY_NAV);
 	} else {
-		SetGameAriaLiveText('Game intro: A map of Netherlands is displayed. A small town Monster is shown south-west of The Hague and Amsterdam.');
+		Gui.setGameAriaLiveText('Game intro: A map of Netherlands is displayed. A small town Monster is shown south-west of The Hague and Amsterdam.');
 	}
 
 	// Cross-browser support for requestAnimationFrame
