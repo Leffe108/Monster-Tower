@@ -59,7 +59,7 @@ var Animation = (function() {
 			var animation = _animations[i];
 			var start_alpha = 0.5;
 			g_context.globalAlpha = start_alpha * (_ANIMATION_MAX_TIME - animation.timer) / (_ANIMATION_MAX_TIME);
-			DrawImage(animation.image, animation.x, animation.y, animation.angle);
+			MtImage.draw(animation.image, animation.x, animation.y, animation.angle);
 			g_context.globalAlpha = 1.0;
 		}
 	};

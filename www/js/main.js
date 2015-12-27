@@ -8,7 +8,6 @@ var g_view_offset_x = null;
 var g_context = null;
 var g_dirty_screen = null; // needs redraw? true/false
 var g_logo_timer = null;
-var g_images = null;
 var g_open_windows = null; // gui open windows
 var g_hovered_overlay_item = null; // null or object with keys 'screen_x', 'screen_y' and 'data'.
 var g_toolbar_buildable_rooms = null; // array of rooms that can currently be built. The order affects toolbars
@@ -95,71 +94,6 @@ function SwapCanvas() {
 	g_context = g_canvas.getContext("2d");
 }
 
-/**
- * @param name The name identifier of the image which is also the file name excluding '.png'.
- * @param base_x X offset to the point in the image that will be rendered as 0,0 of this image
- * @param base_y Y offset to the point in the image that will be rendered as 0,0 of this image
- */
-function LoadImage(name, base_x, base_y) {
-	var img = new Image();
-	img.id = name;
-	// custom members
-	img.base_x = base_x;
-	img.base_y = base_y;
-	img.complete = false;
-
-	img.onLoad = function (e) {
-		e = e || window.event;
-		var target = e.target || e.srcElement;
-		target.complete = true;
-	};
-	img.src = "images/" + name + ".png";
-	g_images[name] = img;
-}
-
-// Loads images into g_images[name]
-function LoadImages() {
-	g_images = {};
-
-	LoadImage("map1", 0, 0);
-	LoadImage("map2", 0, 0);
-
-	LoadImage("underground", 0, 0);
-	LoadImage("sky", 0, 0);
-	LoadImage("ceiling", 0, 0);
-	LoadImage("build", 0, 0);
-	LoadImage("money", 16, 16); // green money
-	LoadImage("cost", 16, 16);
-
-	// GUI
-	LoadImage("build-complete", 0, 0);
-	LoadImage("load", 0, 0);
-	LoadImage("save", 0, 0);
-	LoadImage("help", 0, 0);
-	LoadImage("view-up", 0, 0);
-	LoadImage("view-down", 0, 0);
-	LoadImage("view-left", 0, 0);
-	LoadImage("view-right", 0, 0);
-	LoadImage("game-over", 0, 0);
-	LoadImage("won", 0, 0);
-	LoadImage("game-star-level-no-star", 0, 0);
-	LoadImage("game-star-level-1", 0, 0);
-	LoadImage("game-star-level-2", 0, 0);
-	LoadImage("game-star-level-3", 0, 0);
-}
-
-function LoadGameDefImages() {
-	for (id in g_room_types) {
-		LoadImage(g_room_types[id].image, 0, 0);
-		if (RoomType.isStairLayerRoom(id)) {
-			LoadImage(g_room_types[id].image + '-build-icon', 0, 0);
-		} else {
-			LoadImage(g_room_types[id].image + '-closed', 0, 0);
-			if (id !== 'town-hall-room') LoadImage(g_room_types[id].image + '-for-rent', 0, 0);
-		}
-	}
-}
-
 function InitGameState()
 {
 	g_simulation_time = 0;
@@ -230,34 +164,6 @@ function Update(time) {
 	// Always update GUI
 	Animation.updateAll(gui_time);
 }
-
-/**
- * Draws an image at x,y.
- * x and y will be floored to integers if they are not
- * already integers.
- * @param angle Rotation angle. Defaults to 0
- */
-function DrawImage(image, x, y, angle) {
-	if (angle == null) angle = 0;
-	var img = g_images[image];
-	if (img.complete && img.width > 0) { // .complete is always true in FF
-		g_context.save();
-		g_context.translate(Math.floor(x), Math.floor(y));
-		g_context.rotate(angle);
-		g_context.drawImage(img, -img.base_x, -img.base_y);
-		g_context.restore();
-	}
-}
-/**
- * Draws an image centered on the canvas.
- */
-function DrawImageCentered(image) {
-	var img = g_images[image];
-	if (!img.complete || img.width <= 0) return;
-	var x = g_canvas.width/2 - img.width/2;
-	var y = g_canvas.height/2 - img.height/2;
-	DrawImage(image, x, y);
-}
 function TimeStr(time) {
 	var h = "" + Math.floor(time / 60);
 	var m = "" + Math.floor(Math.floor(time - h * 60) / 15) * 15;
@@ -327,7 +233,7 @@ function Render() {
 	}
 	if (splash_screen_image !== null) {
 		DrawRect('rgb(255, 255, 255)', '', 0, 0, g_canvas.width, g_canvas.height);
-		DrawImageCentered(splash_screen_image);
+		MtImage.drawCentered(splash_screen_image);
 		SwapCanvas();
 		return;
 	}
@@ -350,10 +256,10 @@ function Render() {
 				if (map_y >= 0) {
 					DrawRect(sky_color, '', screen_x, screen_y, 32, 32, sky_color);
 				} else {
-					DrawImage("underground", screen_x, screen_y);
+					MtImage.draw("underground", screen_x, screen_y);
 				}
 
-				if (map_y == -1) DrawImage("ceiling", screen_x, screen_y);
+				if (map_y == -1) MtImage.draw("ceiling", screen_x, screen_y);
 			}
 		}
 	}
@@ -370,7 +276,7 @@ function Render() {
 				var add = '';
 				if (room.state === Room.ROOM_STATE_FOR_RENT) add = '-for-rent';
 				else if (room.state === Room.ROOM_STATE_CLOSED) add = '-closed';
-				DrawImage(room.def.image + add, screen_pos[0], screen_pos[1]);
+				MtImage.draw(room.def.image + add, screen_pos[0], screen_pos[1]);
 			}
 		}
 	}
@@ -386,7 +292,7 @@ function Render() {
 				var screen_pos = MapToScreen(stair.x, floor_num);
 
 				var add = '';
-				DrawImage(stair.def.image + add, screen_pos[0], screen_pos[1] - 16);
+				MtImage.draw(stair.def.image + add, screen_pos[0], screen_pos[1] - 16);
 			}
 		}
 	}
@@ -401,7 +307,7 @@ function Render() {
 				var screen_pos = MapToScreen(elevator.x, floor_num);
 
 				var add = '';
-				DrawImage(elevator.def.image + add, screen_pos[0], screen_pos[1]);
+				MtImage.draw(elevator.def.image + add, screen_pos[0], screen_pos[1]);
 			}
 		}
 	}
@@ -413,7 +319,7 @@ function Render() {
 		var room_def = g_hovered_overlay_item.room_def;
 		var y_offset = room_def.id === 'stair' ? -16 : 0;
 		var screen_pos = MapToScreen(g_hovered_overlay_item.x, g_hovered_overlay_item.floor);
-		DrawImage(room_def.image, screen_pos[0], screen_pos[1] + y_offset);
+		MtImage.draw(room_def.image, screen_pos[0], screen_pos[1] + y_offset);
 	}
 
 	Gui.drawToolbar();
@@ -459,11 +365,12 @@ function Main() {
 function Init() {
 	g_logo_timer = 0;
 	InitCanvas();
-	LoadImages();
+	MtImage.init();
+	MtImage.loadStatic();
 	InitGameState();
 	Animation.init();
 	Gui.init();
-	LoadGameDefImages();
+	MtImage.loadRoomTypeImages();
 
 	if (DISABLE_LOGO_INTRO) {
 		Gui.switchOverlay(OVERLAY_NAV);

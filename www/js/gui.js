@@ -244,19 +244,19 @@ var Gui = (function() {
 		var x = 0;
 		var y = 0;
 		if (isNavOverlayActive()) {
-			DrawImage('help', x, y, 0);
+			MtImage.draw('help', x, y, 0);
 			x += 32;
-			DrawImage('load', x, y, 0);
+			MtImage.draw('load', x, y, 0);
 			x += 32;
-			DrawImage('save', x, y, 0);
+			MtImage.draw('save', x, y, 0);
 			x += 32;
-			DrawImage('view-up', x, y, 0);
+			MtImage.draw('view-up', x, y, 0);
 			x += 32;
-			DrawImage('view-down', x, y, 0);
+			MtImage.draw('view-down', x, y, 0);
 			x += 32;
-			DrawImage('view-left', x, y, 0);
+			MtImage.draw('view-left', x, y, 0);
 			x += 32;
-			DrawImage('view-right', x, y, 0);
+			MtImage.draw('view-right', x, y, 0);
 			x += 32;
 
 			var star_button_image = '';
@@ -270,7 +270,7 @@ var Gui = (function() {
 					star_button_image = 'game-star-level-' + g_game_star_level;
 					break;
 			}
-			DrawImage(star_button_image, x, y, 0);
+			MtImage.draw(star_button_image, x, y, 0);
 			x += 96;
 
 			for (var i = 0; i < g_toolbar_buildable_rooms.length; i++) {
@@ -284,21 +284,21 @@ var Gui = (function() {
 				}
 
 				var suffix = room_type === 'stair' || room_type === 'elevator' ? '-build-icon' : '';
-				DrawImage(room_def.image + suffix, x, y, 0);
-				//DrawImage('build', x + (g_room_types[room_type].width * 16 - 32) / 2, 0, 0);
+				MtImage.draw(room_def.image + suffix, x, y, 0);
+				//MtImage.draw('build', x + (g_room_types[room_type].width * 16 - 32) / 2, 0, 0);
 				x += g_room_types[room_type].width * 16;
 			}
 
 		} else if (isBuildNewOverlayActive()) {
-			DrawImage('build-complete', x, 0, 0);
+			MtImage.draw('build-complete', x, 0, 0);
 			x += 32;
-			DrawImage('view-up', x, 0, 0);
+			MtImage.draw('view-up', x, 0, 0);
 			x += 32;
-			DrawImage('view-down', x, 0, 0);
+			MtImage.draw('view-down', x, 0, 0);
 			x += 32;
-			DrawImage('view-left', x, 0, 0);
+			MtImage.draw('view-left', x, 0, 0);
 			x += 32;
-			DrawImage('view-right', x, 0, 0);
+			MtImage.draw('view-right', x, 0, 0);
 			x += 32;
 		}
 	};
