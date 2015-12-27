@@ -474,7 +474,8 @@ var Gui = (function() {
 	};
 
 	var drawBuildCursor = function() {
-		if (g_build_cursor_data.room_def !== null && g_build_cursor_data.can_build) {
+		if (g_build_cursor_data.room_def !== null && g_build_cursor_data.can_build &&
+				g_build_cursor_data.dom.cursor.find('a:focus').length !== 0) {
 			/* Draw room at cursor position. */
 			var room_def = g_build_cursor_data.room_def;
 			var screen_pos = MapToScreen(g_build_cursor_data.x, g_build_cursor_data.floor);
