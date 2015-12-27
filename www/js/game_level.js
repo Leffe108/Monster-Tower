@@ -97,7 +97,7 @@ var GameLevel = (function() {
 		}
 
 		// Build toolbar may change due to new rooms being available
-		RebuildToolbars();
+		Gui.rebuildToolbars();
 	};
 
 	var isGameOver = function() {
