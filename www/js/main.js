@@ -127,7 +127,7 @@ function Update(time) {
 	// screen to reload game.
 	if ((GameLevel.isGameOver() || GameLevel.isGameWon()) && !Gui.isGameOverOverlayActive()) {
 		while (Gui.hasOpenWindows()) Gui.closeTopWindow();
-		SwitchOverlay(OVERLAY_GAME_OVER);
+		Gui.switchOverlay(Gui.OVERLAY_GAME_OVER);
 		g_dirty_screen = true;
 	}
 
@@ -360,7 +360,7 @@ function Init() {
 	MtImage.loadRoomTypeImages();
 
 	if (DISABLE_LOGO_INTRO) {
-		Gui.switchOverlay(OVERLAY_NAV);
+		Gui.switchOverlay(Gui.OVERLAY_NAV);
 	} else {
 		Gui.setGameAriaLiveText('Game intro: A map of Netherlands is displayed. A small town Monster is shown south-west of The Hague and Amsterdam.');
 	}

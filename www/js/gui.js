@@ -205,7 +205,7 @@ var Gui = (function() {
 		$('#gui-game-over-overlay').append(a);
 	};
 
-	/** Rebuilds the nav overlay except for toolbars, use RebuildToolbars for that. */
+	/** Rebuilds the nav overlay except for toolbars, use rebuildToolbars for that. */
 	var rebuildNavOverlay = function(room_def) {
 
 		$('#gui-nav-overlay').find('ul[data-nav-type=room]').find('li').remove();
@@ -1045,7 +1045,7 @@ var Gui = (function() {
 	var WidgetAction = function(w, widget_name, widget_type) {
 		// Close window?
 		if (widget_type == 'close') {
-			CloseTopWindow();
+			closeTopWindow();
 			return;
 		}
 
@@ -1056,7 +1056,7 @@ var Gui = (function() {
 					case 'demolish':
 						if (Money.tryBuy(w.room.def.demolish_cost)) {
 							Building.demolishRoom(w.room);
-							CloseTopWindow();
+							closeTopWindow();
 						}
 						break;
 				}
@@ -1067,7 +1067,7 @@ var Gui = (function() {
 					case 'show_intro':
 						g_logo_timer = 0;
 						DISABLE_LOGO_INTRO = false;
-						CloseTopWindow();
+						closeTopWindow();
 						break;
 				}
 				break;
@@ -1076,8 +1076,8 @@ var Gui = (function() {
 				switch (widget_name) {
 					case 'new_game':
 						InitGameState();
-						CloseTopWindow();
-						RebuildToolbars();
+						closeTopWindow();
+						rebuildToolbars();
 						rebuildNavOverlay();
 						if (isBuildNewOverlayActive()) switchOverlay(OVERLAY_NAV);
 						break;
@@ -1086,12 +1086,12 @@ var Gui = (function() {
 						var json_str = $(w.dom_node).find('textarea').val();
 						var loaded = SaveLoad.loadGameStateFromJsonStr(json_str);
 						if (loaded) {
-							CloseTopWindow();
+							closeTopWindow();
 						} else {
 							showWindow(getMessageWindow('Load failed', ['Loading the game data failed. :-(']));
 							g_dirty_screen = true;
 						}
-						RebuildToolbars();
+						rebuildToolbars();
 						rebuildNavOverlay();
 						if (isBuildNewOverlayActive()) switchOverlay(OVERLAY_NAV);
 						break;
