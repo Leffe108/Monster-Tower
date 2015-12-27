@@ -825,7 +825,7 @@ function GetSaveWindow() {
 		new WidLabel(
 			'Copy save data text below and save somewhere safe, or email a friend:'
 		),
-		new WidTextArea('Save data', SaveGameStateToJsonStr(), 'save_json'),
+		new WidTextArea('Save data', SaveLoad.saveGameStateToJsonStr(), 'save_json'),
 		new WidClose(),
 	];
 	return w;
@@ -1131,7 +1131,7 @@ function WidgetAction(w, widget_name, widget_type) {
 
 				case 'load_json_game':
 					var json_str = $(w.dom_node).find('textarea').val();
-					var loaded = LoadGameStateFromJsonStr(json_str);
+					var loaded = SaveLoad.loadGameStateFromJsonStr(json_str);
 					if (loaded) {
 						CloseTopWindow();
 					} else {
