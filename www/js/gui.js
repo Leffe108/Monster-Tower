@@ -239,11 +239,11 @@ function RebuildToolbars() {
 }
 
 function InitGameOverOverlay() {
-	var won = IsGameWon();
+	var won = GameLevel.isGameWon();
 	var a = $('<a tabindex="0" class="play-again">');
 	a.on('click', function() {
-		if (g_game_win_lose === GWL_WON) {
-			g_game_win_lose = GWL_WON_CONTINUE_PLAY;
+		if (GameLevel.isGameWon()) {
+			GameLevel.wonContinuePlay();
 			SwitchOverlay(OVERLAY_NAV);
 		} else {
 			location.reload(); // Reload page
@@ -304,12 +304,12 @@ function DrawToolbar() {
 
 		var star_button_image = '';
 		switch (g_game_star_level) {
-			case GSL_NO_STAR:
+			case GameLevel.GSL_NO_STAR:
 				star_button_image = 'game-star-level-no-star';
 				break;
-			case GSL_STAR1:
-			case GSL_STAR2:
-			case GSL_STAR3:
+			case GameLevel.GSL_STAR1:
+			case GameLevel.GSL_STAR2:
+			case GameLevel.GSL_STAR3:
 				star_button_image = 'game-star-level-' + g_game_star_level;
 				break;
 		}
@@ -721,34 +721,34 @@ function GetGameStarLevelWindow() {
 	var req_next_star_str = 'Requirements for next star: [you got / you need]';
 	w.widgets.push(new WidLabel('You have ' + stars + ' star' + s, 'center', 'h2'));
 	switch (g_game_star_level) {
-		case GSL_NO_STAR:
+		case GameLevel.GSL_NO_STAR:
 			w.widgets.push(new WidSpacer());
 			w.widgets.push(new WidSpacer());
 			w.widgets.push(new WidLabel(req_next_star_str, 'left'));
-			w.widgets.push(new WidValue("Rented offices", GetRoomRentedCount('office') + ' / ' + STAR1_MIN_OFFICE_RENTED));
+			w.widgets.push(new WidValue("Rented offices", GetRoomRentedCount('office') + ' / ' + GameLevel.STAR1_MIN_OFFICE_RENTED));
 			break;
-		case GSL_STAR1:
+		case GameLevel.GSL_STAR1:
 			w.widgets.push(new WidSpacer());
 			w.widgets.push(new WidSpacer());
 			w.widgets.push(new WidLabel(req_next_star_str, 'left'));
-			w.widgets.push(new WidValue("Number of floors", GetBuildingHeight() + ' / ' + STAR2_MIN_FLOORS));
-			w.widgets.push(new WidValue("Rented offices", GetRoomRentedCount('office') + ' / ' + STAR2_MIN_OFFICE_RENTED));
-			w.widgets.push(new WidValue("Rented cafeteria", GetRoomRentedCount('cafeteria') + ' / ' + STAR2_MIN_CAFETERIA));
+			w.widgets.push(new WidValue("Number of floors", GetBuildingHeight() + ' / ' + GameLevel.STAR2_MIN_FLOORS));
+			w.widgets.push(new WidValue("Rented offices", GetRoomRentedCount('office') + ' / ' + GameLevel.STAR2_MIN_OFFICE_RENTED));
+			w.widgets.push(new WidValue("Rented cafeteria", GetRoomRentedCount('cafeteria') + ' / ' + GameLevel.STAR2_MIN_CAFETERIA));
 			break;
-		case GSL_STAR2:
+		case GameLevel.GSL_STAR2:
 			w.widgets.push(new WidSpacer());
 			w.widgets.push(new WidSpacer());
 			w.widgets.push(new WidLabel(req_next_star_str, 'left'));
-			w.widgets.push(new WidValue("Number of floors", GetBuildingHeight() + ' / ' + STAR3_MIN_FLOORS));
-			w.widgets.push(new WidValue("Rented offices", GetRoomRentedCount('office') + ' / ' + STAR3_MIN_OFFICE_RENTED));
-			w.widgets.push(new WidValue("Rented cafeteria", GetRoomRentedCount('cafeteria') + ' / ' + STAR3_MIN_CAFETERIA));
-			w.widgets.push(new WidValue("Rented flower shops", GetRoomRentedCount('flower-shop') + ' / ' + STAR3_MIN_FLOWER_SHOP));
+			w.widgets.push(new WidValue("Number of floors", GetBuildingHeight() + ' / ' + GameLevel.STAR3_MIN_FLOORS));
+			w.widgets.push(new WidValue("Rented offices", GetRoomRentedCount('office') + ' / ' + GameLevel.STAR3_MIN_OFFICE_RENTED));
+			w.widgets.push(new WidValue("Rented cafeteria", GetRoomRentedCount('cafeteria') + ' / ' + GameLevel.STAR3_MIN_CAFETERIA));
+			w.widgets.push(new WidValue("Rented flower shops", GetRoomRentedCount('flower-shop') + ' / ' + GameLevel.STAR3_MIN_FLOWER_SHOP));
 			break;
-		case GSL_STAR3:
+		case GameLevel.GSL_STAR3:
 			w.widgets.push(new WidSpacer());
 			w.widgets.push(new WidSpacer());
 			w.widgets.push(new WidLabel('To win the game: [you have / you need]', 'left'));
-			w.widgets.push(new WidValue("Number of floors", GetBuildingHeight() + ' / ' + WIN_GAME_MIN_FLOORS));
+			w.widgets.push(new WidValue("Number of floors", GetBuildingHeight() + ' / ' + GameLevel.WIN_GAME_MIN_FLOORS));
 			break;
 	}
 	w.widgets.push(new WidClose());

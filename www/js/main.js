@@ -168,7 +168,7 @@ function InitGameState()
 	g_game_speed = 100.0;
 	g_game_paused = true;
 
-	GameLevelInit();
+	GameLevel.init();
 	Money.init();
 	RoomTypeInit();
 	BuildingInit();
@@ -196,7 +196,7 @@ function Update(time) {
 
 	// If game was just lost, enable click detection on game over
 	// screen to reload game.
-	if ((IsGameOver() || IsGameWon()) && !IsGameOverOverlayActive()) {
+	if ((GameLevel.isGameOver() || GameLevel.isGameWon()) && !IsGameOverOverlayActive()) {
 		while (HasOpenWindows()) CloseTopWindow();
 		SwitchOverlay(OVERLAY_GAME_OVER);
 		g_dirty_screen = true;
@@ -206,7 +206,7 @@ function Update(time) {
 	// - pause when window is open, as many display stats that don't update unless the
 	//   window is re-opened.
 	var old_paused = g_game_paused;
-	g_game_paused = IsIntroWindowOpen() || HasOpenWindows() || IsGameOver() || IsGameWon();
+	g_game_paused = IsIntroWindowOpen() || HasOpenWindows() || GameLevel.isGameOver() || GameLevel.isGameWon();
 	if (!g_game_paused) {
 		g_simulation_time += time; // one second = one in-game minute
 		while (g_simulation_time > 24 * 60) {
@@ -216,7 +216,7 @@ function Update(time) {
 
 		UpdateRooms(time);
 		Money.update(time);
-		UpdateGameLevel(time);
+		GameLevel.update(time);
 
 		g_dirty_screen = true;
 	} else if (!old_paused) {
@@ -322,9 +322,9 @@ function Render() {
 	var splash_screen_image = null;
 	if (g_logo_timer >= 0 && !DISABLE_LOGO_INTRO) {
 		splash_screen_image = g_logo_timer < 1 ? "map1" : "map2";
-	} else if (IsGameOver()) {
+	} else if (GameLevel.isGameOver()) {
 		splash_screen_image = "game-over";
-	} else if (IsGameWon()) {
+	} else if (GameLevel.isGameWon()) {
 		splash_screen_image = "won";
 	}
 	if (splash_screen_image !== null) {

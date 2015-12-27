@@ -44,8 +44,8 @@ function LoadGameStateFromJsonStr(json_str) {
 		// Validation
 		var valid = true;
 		valid &= typeof g_simulation_time === 'number';
-		valid &= IsValidGameWinLose(g_game_win_lose);
-		valid &= IsValidGameStarLevel(g_game_star_level);
+		valid &= GameLevel.isValidGameWinLose(g_game_win_lose);
+		valid &= GameLevel.isValidGameStarLevel(g_game_star_level);
 		valid &= typeof g_bank_balance === 'number';
 		valid &= g_room_floors !== false;
 		valid &= g_stair_floors !== false;
