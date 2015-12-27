@@ -1132,6 +1132,7 @@ var Gui = (function() {
 		init: init,
 		switchOverlay: switchOverlay,
 		drawToolbar: drawToolbar,
+		addOverlayItem: addOverlayItem,
 		removeOverlayItem: removeOverlayItem,
 		rebuildToolbars: rebuildToolbars,
 
@@ -1143,6 +1144,7 @@ var Gui = (function() {
 		hasOpenWindows: hasOpenWindows,
 
 		getIntroWindow: getIntroWindow,
+		getMessageWindow: getMessageWindow,
 		closeTopWindow: closeTopWindow,
 		positionWindows: positionWindows,
 		showWindow: showWindow,
