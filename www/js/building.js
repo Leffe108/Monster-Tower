@@ -32,7 +32,7 @@ var Building = (function() {
 
 		if (!canBuildRoomHere(room_type, x, floor_num)) return false;
 
-		var floors_container = IsStairLayerRoom(room_type) ? g_stair_floors : g_room_floors;
+		var floors_container = RoomType.isStairLayerRoom(room_type) ? g_stair_floors : g_room_floors;
 		var floor_data = _getFloorData(floors_container, floor_num, true);
 		var room_def = g_room_types[room_type];
 
@@ -47,18 +47,18 @@ var Building = (function() {
 			floor: floor_num,
 			width: room_def.width,
 			def: room_def,
-			state: ROOM_STATE_FOR_RENT,
+			state: Room.ROOM_STATE_FOR_RENT,
 			rent_day: 0, // simulation day when room was rent
 			build_day: g_simulation_day, // simulation day when room was built
 			not_reachable_counter: 0, // 0 or time it has not been reachable (via stairs)
 		};
-		if (IsStairLayerRoom(room_type)) room_instance.state = ROOM_STATE_OPEN;
-		if (room_type === 'town-hall-room') room_instance.state = ROOM_STATE_CLOSED;
+		if (RoomType.isStairLayerRoom(room_type)) room_instance.state = Room.ROOM_STATE_OPEN;
+		if (room_type === 'town-hall-room') room_instance.state = Room.ROOM_STATE_CLOSED;
 
 		floor_data.splice(insert_index, 0, room_instance);
 		addOverlayItemForRoom(room_instance);
 
-		if (IsStairLayerRoom(room_type)) rebuildReachableFloors();
+		if (RoomType.isStairLayerRoom(room_type)) rebuildReachableFloors();
 
 		return true;
 	};
@@ -78,7 +78,7 @@ var Building = (function() {
 	 */
 	var demolishRoom = function(room_instance) {
 
-		var floors_container = IsStairLayerRoom(room_instance.def.id) ? g_stair_floors : g_room_floors;
+		var floors_container = RoomType.isStairLayerRoom(room_instance.def.id) ? g_stair_floors : g_room_floors;
 		var floor_data = _getFloorData(floors_container, room_instance.floor, false);
 		assert(floor_data !== null);
 
@@ -88,7 +88,7 @@ var Building = (function() {
 
 				var screen_pos = MapToScreen(room_instance.x, room_instance.floor_num);
 				RemoveOverlayItem(room_instance.overlay_item);
-				if (IsStairLayerRoom(room_instance.def.id)) rebuildReachableFloors();
+				if (RoomType.isStairLayerRoom(room_instance.def.id)) rebuildReachableFloors();
 				return;
 			}
 		}
@@ -101,10 +101,10 @@ var Building = (function() {
 	var canBuildRoomHere = function(room_type, x, floor_num) {
 
 		// Stairs are different enough so they are handled separate
-		if (IsStairLayerRoom(room_type)) return _canBuildStairHere(room_type, x, floor_num);
+		if (RoomType.isStairLayerRoom(room_type)) return _canBuildStairHere(room_type, x, floor_num);
 
 		// Town Hall Room can only be built once
-		if (room_type === 'town-hall-room' && GetRoomCount(room_type) > 0) return false;
+		if (room_type === 'town-hall-room' && Room.getCount(room_type) > 0) return false;
 
 		var room_def = g_room_types[room_type];
 		if (floor_num in g_room_floors) {
@@ -139,7 +139,7 @@ var Building = (function() {
 	 * @param room_type A stair room type
 	 */
 	var _canBuildStairHere = function(room_type, x, floor_num) {
-		assert(IsStairLayerRoom(room_type));
+		assert(RoomType.isStairLayerRoom(room_type));
 		var room_def = g_room_types[room_type];
 
 		// Stairs cannot be built over floor 15

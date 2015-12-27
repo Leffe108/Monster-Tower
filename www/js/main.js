@@ -152,7 +152,7 @@ function LoadImages() {
 function LoadGameDefImages() {
 	for (id in g_room_types) {
 		LoadImage(g_room_types[id].image, 0, 0);
-		if (IsStairLayerRoom(id)) {
+		if (RoomType.isStairLayerRoom(id)) {
 			LoadImage(g_room_types[id].image + '-build-icon', 0, 0);
 		} else {
 			LoadImage(g_room_types[id].image + '-closed', 0, 0);
@@ -170,7 +170,7 @@ function InitGameState()
 
 	GameLevel.init();
 	Money.init();
-	RoomTypeInit();
+	RoomType.init();
 	Building.init();
 }
 
@@ -214,7 +214,7 @@ function Update(time) {
 			g_simulation_day++;
 		}
 
-		UpdateRooms(time);
+		Room.updateAll(time);
 		Money.update(time);
 		GameLevel.update(time);
 
@@ -370,8 +370,8 @@ function Render() {
 				var screen_pos = MapToScreen(room.x, floor_num);
 
 				var add = '';
-				if (room.state === ROOM_STATE_FOR_RENT) add = '-for-rent';
-				else if (room.state === ROOM_STATE_CLOSED) add = '-closed';
+				if (room.state === Room.ROOM_STATE_FOR_RENT) add = '-for-rent';
+				else if (room.state === Room.ROOM_STATE_CLOSED) add = '-closed';
 				DrawImage(room.def.image + add, screen_pos[0], screen_pos[1]);
 			}
 		}

@@ -19,7 +19,7 @@ var Money = (function() {
 					var room_data = floor_data[i];
 
 					balance_change -= room_data.def.maint_cost;
-					if (room_data.state !== ROOM_STATE_FOR_RENT) {
+					if (room_data.state !== Room.ROOM_STATE_FOR_RENT) {
 						balance_change += room_data.def.rent_income;
 					}
 				}

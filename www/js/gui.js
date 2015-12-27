@@ -351,7 +351,7 @@ function ToolbarClick(toolbar_button) {
 	// Handle build_<room_type>
 	for (room_type in g_room_types) {
 		if (toolbar_button.id === 'build_' + room_type) {
-			if (room_type === 'town-hall-room' && GetRoomCount(room_type) > 0) {
+			if (room_type === 'town-hall-room' && Room.getCount(room_type) > 0) {
 				ShowWindow(GetMessageWindow('Only one', ['Only one room of this type can be built.']));
 			} else if (g_bank_balance < g_room_types[room_type].buy_cost) {
 				ShowCannotAffordWindow(g_room_types[room_type]);
@@ -695,11 +695,11 @@ function GetRoomWindow(room) {
 	w.room = room;
 	w.widgets = [];
 
-	var for_rent = room.state === ROOM_STATE_FOR_RENT;
+	var for_rent = room.state === Room.ROOM_STATE_FOR_RENT;
 
 	w.widgets.push(new WidLabel(StrFirstToUpper(room.def.name) + ' at floor ' + room.floor, 'center', 'h2'));
 	w.widgets.push(new WidValue("Maintenance cost", MoneyStr(room.def.maint_cost) + ' / day'));
-	if (!IsStairLayerRoom(room.def.id)) { // Stairs give no income
+	if (!RoomType.isStairLayerRoom(room.def.id)) { // Stairs give no income
 		w.widgets.push(new WidValue("Rent income", MoneyStr(for_rent ? 0 : room.def.rent_income) + ' / day'));
 	}
 	w.widgets.push(new WidCostAction('Demolish', MoneyStr(room.def.demolish_cost), 'demolish'));
@@ -725,24 +725,24 @@ function GetGameStarLevelWindow() {
 			w.widgets.push(new WidSpacer());
 			w.widgets.push(new WidSpacer());
 			w.widgets.push(new WidLabel(req_next_star_str, 'left'));
-			w.widgets.push(new WidValue("Rented offices", GetRoomRentedCount('office') + ' / ' + GameLevel.STAR1_MIN_OFFICE_RENTED));
+			w.widgets.push(new WidValue("Rented offices", Room.getRentedCount('office') + ' / ' + GameLevel.STAR1_MIN_OFFICE_RENTED));
 			break;
 		case GameLevel.GSL_STAR1:
 			w.widgets.push(new WidSpacer());
 			w.widgets.push(new WidSpacer());
 			w.widgets.push(new WidLabel(req_next_star_str, 'left'));
 			w.widgets.push(new WidValue("Number of floors", Building.getBuildingHeight() + ' / ' + GameLevel.STAR2_MIN_FLOORS));
-			w.widgets.push(new WidValue("Rented offices", GetRoomRentedCount('office') + ' / ' + GameLevel.STAR2_MIN_OFFICE_RENTED));
-			w.widgets.push(new WidValue("Rented cafeteria", GetRoomRentedCount('cafeteria') + ' / ' + GameLevel.STAR2_MIN_CAFETERIA));
+			w.widgets.push(new WidValue("Rented offices", Room.getRentedCount('office') + ' / ' + GameLevel.STAR2_MIN_OFFICE_RENTED));
+			w.widgets.push(new WidValue("Rented cafeteria", Room.getRentedCount('cafeteria') + ' / ' + GameLevel.STAR2_MIN_CAFETERIA));
 			break;
 		case GameLevel.GSL_STAR2:
 			w.widgets.push(new WidSpacer());
 			w.widgets.push(new WidSpacer());
 			w.widgets.push(new WidLabel(req_next_star_str, 'left'));
 			w.widgets.push(new WidValue("Number of floors", Building.getBuildingHeight() + ' / ' + GameLevel.STAR3_MIN_FLOORS));
-			w.widgets.push(new WidValue("Rented offices", GetRoomRentedCount('office') + ' / ' + GameLevel.STAR3_MIN_OFFICE_RENTED));
-			w.widgets.push(new WidValue("Rented cafeteria", GetRoomRentedCount('cafeteria') + ' / ' + GameLevel.STAR3_MIN_CAFETERIA));
-			w.widgets.push(new WidValue("Rented flower shops", GetRoomRentedCount('flower-shop') + ' / ' + GameLevel.STAR3_MIN_FLOWER_SHOP));
+			w.widgets.push(new WidValue("Rented offices", Room.getRentedCount('office') + ' / ' + GameLevel.STAR3_MIN_OFFICE_RENTED));
+			w.widgets.push(new WidValue("Rented cafeteria", Room.getRentedCount('cafeteria') + ' / ' + GameLevel.STAR3_MIN_CAFETERIA));
+			w.widgets.push(new WidValue("Rented flower shops", Room.getRentedCount('flower-shop') + ' / ' + GameLevel.STAR3_MIN_FLOWER_SHOP));
 			break;
 		case GameLevel.GSL_STAR3:
 			w.widgets.push(new WidSpacer());

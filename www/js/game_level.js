@@ -61,21 +61,21 @@ var GameLevel = (function() {
 		// Update stars
 		switch (g_game_star_level) {
 			case GSL_NO_STAR:
-				if (GetRoomRentedCount('office') >= STAR1_MIN_OFFICE_RENTED) {
+				if (Room.getRentedCount('office') >= STAR1_MIN_OFFICE_RENTED) {
 					_setGameStarLevel(g_game_star_level + 1);
 				}
 				break;
 			case GSL_STAR1:
-				if (GetRoomRentedCount('office') >= STAR2_MIN_OFFICE_RENTED &&
-						GetRoomRentedCount('cafeteria') >= STAR2_MIN_CAFETERIA &&
+				if (Room.getRentedCount('office') >= STAR2_MIN_OFFICE_RENTED &&
+						Room.getRentedCount('cafeteria') >= STAR2_MIN_CAFETERIA &&
 						Building.getBuildingHeight() >= STAR2_MIN_FLOORS) {
 					_setGameStarLevel(g_game_star_level + 1);
 				}
 				break;
 			case GSL_STAR2:
-				if (GetRoomRentedCount('office') >= STAR3_MIN_OFFICE_RENTED &&
-						GetRoomRentedCount('cafeteria') >= STAR3_MIN_CAFETERIA &&
-						GetRoomRentedCount('flower-shop') >= STAR3_MIN_FLOWER_SHOP &&
+				if (Room.getRentedCount('office') >= STAR3_MIN_OFFICE_RENTED &&
+						Room.getRentedCount('cafeteria') >= STAR3_MIN_CAFETERIA &&
+						Room.getRentedCount('flower-shop') >= STAR3_MIN_FLOWER_SHOP &&
 						Building.getBuildingHeight() >= STAR3_MIN_FLOORS) {
 					_setGameStarLevel(g_game_star_level + 1);
 				}

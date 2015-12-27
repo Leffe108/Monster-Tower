@@ -105,7 +105,7 @@ var SaveLoad = (function() {
 				if (!room.def in g_room_types) return false;
 				room.def = g_room_types[room.def];
 				room.overlay_item = null;
-				if (!ValidateRoom(room)) return false;
+				if (!Room.validate(room)) return false;
 			}
 		}
 
