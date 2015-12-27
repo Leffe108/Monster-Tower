@@ -10,7 +10,9 @@ var Gui = (function() {
 	var OVERLAY_WINDOWS = 3;
 	var OVERLAY_GAME_OVER = 4;
 
-	var _open_windows = [];
+	var _open_windows = []; // list of open windows
+	var _toolbar_buildable_rooms = null; // array of rooms that can currently be built. The order affects toolbars
+	var _build_cursor_data = null; // object with data for the build new room cursor
 
 	/**
 	 * Initialize GUI-related stuff
@@ -100,13 +102,13 @@ var Gui = (function() {
 		$('#gui-nav-overlay').find('ul[data-nav-type=toolbar]').find('li').remove();
 		$('#gui-build-new-overlay').find('ul[data-nav-type=toolbar]').find('li').remove();
 
-		// Update g_toolbar_buildable_rooms
+		// Update _toolbar_buildable_rooms
 		var master_room_toolbar = ['stair', 'elevator', 'office', 'cafeteria', 'flower-shop', 'town-hall-room'];
-		g_toolbar_buildable_rooms = [];
+		_toolbar_buildable_rooms = [];
 		for (var i = 0; i < master_room_toolbar.length; i++) {
 			var room_def = g_room_types[master_room_toolbar[i]];
 			if (g_game_star_level >= room_def.min_stars) {
-				g_toolbar_buildable_rooms.push(master_room_toolbar[i]);
+				_toolbar_buildable_rooms.push(master_room_toolbar[i]);
 			}
 		}
 
@@ -147,8 +149,8 @@ var Gui = (function() {
 		}, 'Game level', x, y, 96, 'nav', 'toolbar');
 		x += 96;
 
-		for (var i = 0; i < g_toolbar_buildable_rooms.length; i++) {
-			var room_type = g_toolbar_buildable_rooms[i];
+		for (var i = 0; i < _toolbar_buildable_rooms.length; i++) {
+			var room_type = _toolbar_buildable_rooms[i];
 			var room_def = g_room_types[room_type];
 
 			if (room_type === 'town-hall-room') {
@@ -265,8 +267,8 @@ var Gui = (function() {
 			MtImage.draw(star_button_image, x, y, 0);
 			x += 96;
 
-			for (var i = 0; i < g_toolbar_buildable_rooms.length; i++) {
-				var room_type = g_toolbar_buildable_rooms[i];
+			for (var i = 0; i < _toolbar_buildable_rooms.length; i++) {
+				var room_type = _toolbar_buildable_rooms[i];
 				var room_def = g_room_types[room_type];
 
 				if (room_type === 'town-hall-room') {
@@ -345,7 +347,7 @@ var Gui = (function() {
 				rebuildNavOverlay();
 				break;
 			case 'abort_build_new':
-				g_build_cursor_data.room_def = null;
+				_build_cursor_data.room_def = null;
 				switchOverlay(OVERLAY_NAV);
 				break;
 			case 'game_star_level':
@@ -365,7 +367,7 @@ var Gui = (function() {
 		var cursor = $('#gui-build-new-cursor');
 		var a = cursor.find('a');
 
-		g_build_cursor_data = {
+		_build_cursor_data = {
 			/* Map position of cursor */
 			x: 0,
 			floor: 0,
@@ -399,7 +401,7 @@ var Gui = (function() {
 					return;
 
 				case 27: // Escape
-					g_build_cursor_data.room_def = null;
+					_build_cursor_data.room_def = null;
 					switchOverlay(OVERLAY_NAV);
 					e.preventDefault();
 					return;
@@ -426,7 +428,7 @@ var Gui = (function() {
 
 			// Move a whole room at the time if Ctrl key is depressed while using one of the arrow keys
 			if (e.ctrlKey && [37, 40, 38, 39].indexOf(e.which) !== -1) {
-				d_x *= g_build_cursor_data.room_def.width;
+				d_x *= _build_cursor_data.room_def.width;
 				d_floor *= 5;
 				ctrl_use = true;
 			}
@@ -444,12 +446,12 @@ var Gui = (function() {
 		});
 
 		a.on('click', function() {
-			if (g_bank_balance < g_build_cursor_data.room_def.buy_cost) {
-				showCannotAffordWindow(g_build_cursor_data.room_def);
+			if (g_bank_balance < _build_cursor_data.room_def.buy_cost) {
+				showCannotAffordWindow(_build_cursor_data.room_def);
 				return;
 			}
-			if (Building.buildRoom(g_build_cursor_data.room_def.id, g_build_cursor_data.floor, g_build_cursor_data.x)) {
-				g_bank_balance -= g_build_cursor_data.room_def.buy_cost;
+			if (Building.buildRoom(_build_cursor_data.room_def.id, _build_cursor_data.floor, _build_cursor_data.x)) {
+				g_bank_balance -= _build_cursor_data.room_def.buy_cost;
 				Money.animateCost();
 				PlaySoundEffect('build');
 
@@ -466,7 +468,7 @@ var Gui = (function() {
 			var map_pos = ScreenToMap(canvas_x, canvas_y);
 
 			// Adjust so room center follows mouse pointer.
-			var x = Math.floor(map_pos[0] - (g_build_cursor_data.room_def.width - 0.5) / 2.0);
+			var x = Math.floor(map_pos[0] - (_build_cursor_data.room_def.width - 0.5) / 2.0);
 			var floor = Math.floor(map_pos[1]);
 
 			setBuildCursorPosition(x, floor);
@@ -474,11 +476,11 @@ var Gui = (function() {
 	};
 
 	var drawBuildCursor = function() {
-		if (g_build_cursor_data.room_def !== null && g_build_cursor_data.can_build &&
-				g_build_cursor_data.dom.cursor.find('a:focus').length !== 0) {
+		if (_build_cursor_data.room_def !== null && _build_cursor_data.can_build &&
+				_build_cursor_data.dom.cursor.find('a:focus').length !== 0) {
 			/* Draw room at cursor position. */
-			var room_def = g_build_cursor_data.room_def;
-			var screen_pos = MapToScreen(g_build_cursor_data.x, g_build_cursor_data.floor);
+			var room_def = _build_cursor_data.room_def;
+			var screen_pos = MapToScreen(_build_cursor_data.x, _build_cursor_data.floor);
 			var y_offset = room_def.id === 'stair' ? -16 : 0;
 			MtImage.draw(room_def.image, screen_pos[0], screen_pos[1] + y_offset);
 		}
@@ -490,7 +492,7 @@ var Gui = (function() {
 	 * @param d_floor delta floor
 	 */
 	var moveBuildCursor = function(d_x, d_floor) {
-		setBuildCursorPosition(g_build_cursor_data.x + d_x, g_build_cursor_data.floor + d_floor);
+		setBuildCursorPosition(_build_cursor_data.x + d_x, _build_cursor_data.floor + d_floor);
 	};
 
 	/**
@@ -500,7 +502,7 @@ var Gui = (function() {
 	 * @param floor the map floor coordinate
 	 */
 	var setBuildCursorPosition = function(x, floor) {
-		var room_width = g_build_cursor_data.room_def.width;
+		var room_width = _build_cursor_data.room_def.width;
 
 		var screen_pos = MapToScreen(x, floor);
 
@@ -522,13 +524,13 @@ var Gui = (function() {
 			screen_pos = MapToScreen(x, floor);
 		}
 
-		if (x !== g_build_cursor_data.x || floor !== g_build_cursor_data.floor) {
-			g_build_cursor_data.x = x;
-			g_build_cursor_data.floor = floor;
+		if (x !== _build_cursor_data.x || floor !== _build_cursor_data.floor) {
+			_build_cursor_data.x = x;
+			_build_cursor_data.floor = floor;
 
 			(function(){
-				var cursor = g_build_cursor_data.dom.cursor;
-				var a = g_build_cursor_data.dom.a;
+				var cursor = _build_cursor_data.dom.cursor;
+				var a = _build_cursor_data.dom.a;
 				cursor.css('left', screen_pos[0]);
 				cursor.css('top', screen_pos[1]);
 			})();
@@ -541,18 +543,18 @@ var Gui = (function() {
 	 * Updates build cursor regarding if room can be built at current position.
 	 */
 	var updateBuildCursorCanBuildStatus = function() {
-		var cursor = g_build_cursor_data.dom.cursor;
-		var a = g_build_cursor_data.dom.a;
+		var cursor = _build_cursor_data.dom.cursor;
+		var a = _build_cursor_data.dom.a;
 
-		g_build_cursor_data.can_build = Building.canBuildRoomHere(g_build_cursor_data.room_def.id, g_build_cursor_data.x, g_build_cursor_data.floor);
-		if (g_build_cursor_data.can_build) {
+		_build_cursor_data.can_build = Building.canBuildRoomHere(_build_cursor_data.room_def.id, _build_cursor_data.x, _build_cursor_data.floor);
+		if (_build_cursor_data.can_build) {
 			cursor.addClass('can-build');
 			cursor.removeClass('cannot-build');
-			a.attr('title', 'Build ' + g_build_cursor_data.room_def.name);
+			a.attr('title', 'Build ' + _build_cursor_data.room_def.name);
 		} else {
 			cursor.removeClass('can-build');
 			cursor.addClass('cannot-build');
-			a.attr('title', 'Cannot build ' + g_build_cursor_data.room_def.name + ' here');
+			a.attr('title', 'Cannot build ' + _build_cursor_data.room_def.name + ' here');
 		}
 
 	};
@@ -561,7 +563,7 @@ var Gui = (function() {
 	 * Updates the position of the build cursor. Eg. after view scroll
 	 */
 	var updateBuildCursorScreenPosition = function() {
-		setBuildCursorPosition(g_build_cursor_data.x, g_build_cursor_data.floor);
+		setBuildCursorPosition(_build_cursor_data.x, _build_cursor_data.floor);
 	};
 
 	/**
@@ -569,13 +571,13 @@ var Gui = (function() {
 	 * @param room_def the room definition of the room
 	 */
 	var setBuildCursorRoomType = function(room_def) {
-		g_build_cursor_data.room_def = room_def;
+		_build_cursor_data.room_def = room_def;
 
-		var cursor = g_build_cursor_data.dom.cursor;
-		var a = g_build_cursor_data.dom.a;
+		var cursor = _build_cursor_data.dom.cursor;
+		var a = _build_cursor_data.dom.a;
 
 		a.css('width',  (room_def.width * 16) + 'px');
-		var screen_pos = MapToScreen(g_build_cursor_data.x, g_build_cursor_data.floor);
+		var screen_pos = MapToScreen(_build_cursor_data.x, _build_cursor_data.floor);
 		cursor.css('left', screen_pos[0]);
 		cursor.css('top', screen_pos[1]);
 
