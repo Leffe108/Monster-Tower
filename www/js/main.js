@@ -67,7 +67,7 @@ function InitCanvas() {
 		Gui.rebuildToolbars();
 		if (Gui.isBuildNewOverlayActive()) Gui.updateBuildCursorScreenPosition();
 		Gui.rebuildNavOverlay();
-	}
+	};
 }
 
 function ResizeCanvas() {

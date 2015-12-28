@@ -494,7 +494,7 @@ var Gui = (function() {
 			var y_offset = room_def.id === 'stair' ? -16 : 0;
 			MtImage.draw(room_def.image, screen_pos[0], screen_pos[1] + y_offset);
 		}
-	}
+	};
 
 	/**
 	 * Move build cursor by delta x and delta floor.

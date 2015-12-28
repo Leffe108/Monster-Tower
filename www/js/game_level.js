@@ -121,7 +121,7 @@ var GameLevel = (function() {
 	var wonContinuePlay = function() {
 		assert(g_game_win_lose === GWL_WON);
 		g_game_win_lose = GWL_WON_CONTINUE_PLAY;
-	}
+	};
 
 	/**
 	 * Validate if given value is a valid Game Win Lose value
@@ -180,5 +180,5 @@ var GameLevel = (function() {
 		isValidGameWinLose: isValidGameWinLose,
 
 		isValidGameStarLevel: isValidGameStarLevel,
-	}
+	};
 })();

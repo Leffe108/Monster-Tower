@@ -22,7 +22,7 @@ var SaveLoad = (function() {
 			'room_floors': _saveRoomListToJsonObj(g_room_floors),
 			'stair_floors': _saveRoomListToJsonObj(g_stair_floors),
 		});
-	}
+	};
 
 	/**
 	 * Load game state from provided JSON string
@@ -68,7 +68,7 @@ var SaveLoad = (function() {
 			InitGameState();
 			return false;
 		}
-	}
+	};
 
 	/**
 	 * Return a object ready for JSON string conversion where 
@@ -90,7 +90,7 @@ var SaveLoad = (function() {
 			}
 		}
 		return result;
-	}
+	};
 
 	/**
 	 * Iterate over the imported object from JSON string
@@ -115,11 +115,11 @@ var SaveLoad = (function() {
 		}
 
 		return floor_container;
-	}
+	};
 
 	// Export:
 	return {
 		saveGameStateToJsonStr: saveGameStateToJsonStr,
 		loadGameStateFromJsonStr: loadGameStateFromJsonStr,
-	}
+	};
 })();
