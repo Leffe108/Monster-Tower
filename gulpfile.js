@@ -55,7 +55,7 @@ gulp.task('on_js_change', ['lint_js', 'bundle_js', 'minify_js'], function() {
 });
 
 gulp.task('bundle_js', function() {
-	return gulp.src(['www/js/*.js', '!www/js/bundle.js', '!www/js/bundle.min.js'])
+	return gulp.src(['www/js/!(main)*.js', 'www/js/main.js', '!www/js/bundle.js', '!www/js/bundle.min.js'])
 		.pipe(concat('bundle.js'))
 		.pipe(gulp.dest('./www/js/'));
 });
