@@ -273,9 +273,9 @@ var Building = (function() {
 		var floor_data = g_stair_floors[floor_num];
 		var other_floor_data = g_stair_floors[floor_num + level_change];
 		for (var i = 0; i < floor_data.length; i++) {
-			if (floor_data[i].def.id === 'elevator') {
+			if (RoomType.isElevator(floor_data[i].def.id)) {
 				for (var i_other = 0; i_other < other_floor_data.length; i_other++) {
-					if (other_floor_data[i_other].def.id === 'elevator' &&
+					if (RoomType.isElevator(other_floor_data[i_other].def.id) &&
 							floor_data[i].x == other_floor_data[i_other].x) {
 						return true;
 					}

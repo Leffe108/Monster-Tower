@@ -307,7 +307,7 @@ function Render() {
 
 			for (i = 0; i < floor_data.length; i++) {
 				var elevator = floor_data[i];
-				if (elevator.def.id !== 'elevator') continue;
+				if (!RoomType.isElevator(elevator.def.id)) continue;
 				screen_pos = MapToScreen(elevator.x, floor_num);
 
 				add = '';

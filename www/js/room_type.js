@@ -86,14 +86,27 @@ var RoomType = (function() {
 		// After adding a room type, also add it to master_room_toolbar in gui.js for it to show up in the toolbar.
 	};
 
+	/**
+	 * Is the room a stair layer type of room? Eg. a room used to move between floors.
+	 * @param room_type room type name
+	 */
 	var isStairLayerRoom = function(room_type) {
 		return room_type === 'stair' || room_type === 'elevator';
 
+	};
+
+	/**
+	 * Is the room an elevator?
+	 * @param room_type room type name
+	 */
+	var isElevator = function(room_type) {
+		return room_type === 'elevator';
 	};
 
 	// Export:
 	return {
 		init: init,
 		isStairLayerRoom: isStairLayerRoom,
+		isElevator: isElevator,
 	};
 })();
