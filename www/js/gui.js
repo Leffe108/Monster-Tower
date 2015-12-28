@@ -2,6 +2,12 @@
  * GUI related stuff
  */
 
+/* global Building, GameLevel, Money, Room, RoomType, SaveLoad, MtImage */
+/* global g_bank_balance:true, g_canvas, g_dirty_screen:true, g_logo_timer:true, g_game_star_level, g_room_types, g_room_floors, g_stair_floors, g_view_offset_x:true, g_view_offset_floor:true */
+/* global EncodeEntities, InitGameState, MapToScreen, MoneyStr, PlaySoundEffect, ScreenToMap, StrFirstToUpper, DISABLE_LOGO_INTRO:true */
+/* exported g_dirty_screen, g_logo_timer, DISABLE_LOGO_INTRO */
+
+/* exported Gui */
 var Gui = (function() {
 	var BOTTOM_WINDOW_Z = 10; ///< z-index of the window displayed at the bottom of the open window stack.
 
@@ -149,9 +155,9 @@ var Gui = (function() {
 		}, 'Game level', x, y, 96, 'nav', 'toolbar');
 		x += 96;
 
-		for (var i = 0; i < _toolbar_buildable_rooms.length; i++) {
+		for (i = 0; i < _toolbar_buildable_rooms.length; i++) {
 			var room_type = _toolbar_buildable_rooms[i];
-			var room_def = g_room_types[room_type];
+			room_def = g_room_types[room_type];
 
 			if (room_type === 'town-hall-room') {
 				// Town Hall Room doesn't fit on the first row
@@ -206,17 +212,17 @@ var Gui = (function() {
 	};
 
 	/** Rebuilds the nav overlay except for toolbars, use rebuildToolbars for that. */
-	var rebuildNavOverlay = function(room_def) {
+	var rebuildNavOverlay = function() {
 
 		$('#gui-nav-overlay').find('ul[data-nav-type=room]').find('li').remove();
 
-		for (var floor_num = MIN_FLOOR; floor_num <= MAX_FLOOR; floor_num++) {
+		for (var floor_num = Building.MIN_FLOOR; floor_num <= Building.MAX_FLOOR; floor_num++) {
 			var floor_containers = [g_room_floors, g_stair_floors];
 			for (var i_fc = 0; i_fc < floor_containers.length; i_fc++) {
 				var floor_container = floor_containers[i_fc];
 
 				if (floor_num in floor_container) {
-					floor_data = floor_container[floor_num];
+					var floor_data = floor_container[floor_num];
 
 					for (var i = 0; i < floor_data.length; i++) {
 						var room_data = floor_data[i];
@@ -300,14 +306,13 @@ var Gui = (function() {
 	var toolbarClick = function(toolbar_button) {
 
 		// Handle build_<room_type>
-		for (room_type in g_room_types) {
+		for (var room_type in g_room_types) {
 			if (toolbar_button.id === 'build_' + room_type) {
 				if (room_type === 'town-hall-room' && Room.getCount(room_type) > 0) {
 					showWindow(getMessageWindow('Only one', ['Only one room of this type can be built.']));
 				} else if (g_bank_balance < g_room_types[room_type].buy_cost) {
 					showCannotAffordWindow(g_room_types[room_type]);
 				} else {
-					g_current_build_room_type = g_room_types[room_type];
 					setBuildCursorRoomType(g_room_types[room_type]);
 					switchOverlay(OVERLAY_BUILD_NEW);
 				}
@@ -393,7 +398,8 @@ var Gui = (function() {
 				return;
 			}
 
-			var d_x = 0; d_floor = 0;
+			var d_x = 0; 
+			var d_floor = 0;
 			switch (e.which) {
 				case 13: // Enter/return
 					this.click();
@@ -530,7 +536,6 @@ var Gui = (function() {
 
 			(function(){
 				var cursor = _build_cursor_data.dom.cursor;
-				var a = _build_cursor_data.dom.a;
 				cursor.css('left', screen_pos[0]);
 				cursor.css('top', screen_pos[1]);
 			})();
@@ -587,7 +592,7 @@ var Gui = (function() {
 	var showCannotAffordWindow = function(room_def) {
 		var aoeui = {a: 0, o: 0, e: 0, u: 0, i: 0};
 		var a = room_def.id.substr(0, 1) in aoeui ? 'an' : 'a';
-		showWindow(getMessageWindow('Low bank balance', ['You cannot afford ' + a + ' ' + g_room_types[room_type].name]));
+		showWindow(getMessageWindow('Low bank balance', ['You cannot afford ' + a + ' ' + g_room_types[room_def.id].name]));
 	};
 
 	/**

@@ -2,6 +2,8 @@
  * Audio play functions
  */
 
+/* exported PlaySoundEffect */
+
 /**
  * Play a sound effect.
  * @param effect The name of the sound effect used in index.html.

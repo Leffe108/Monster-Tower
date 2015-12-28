@@ -1,3 +1,11 @@
+/*
+ * Main
+ */
+
+/* global Animation, Building, GameLevel, Gui, Money, MtImage, Room, RoomType */
+/* global assert, DrawRect */
+/* exported g_game_win_lose, g_game_star_level, g_reachable_floors, g_floor_stair_distance, g_room_types */
+/* exported INITIAL_BUILDING */
 
 // Global variables
 var g_request_animation_frame_fn = null; // The requestAnimationFrame function 
@@ -145,7 +153,7 @@ function Update(time) {
 
 		Room.updateAll(time);
 		Money.update(time);
-		GameLevel.update(time);
+		GameLevel.update();
 
 		g_dirty_screen = true;
 	} else if (!old_paused) {
@@ -174,14 +182,14 @@ function MoneyStr(amount) {
 function MapToScreen(x, floor) {
 	return [
 		(x + g_view_offset_x) * 16,
-		g_canvas.height - (floor - g_view_offset_floor) * 32
+		g_canvas.height - (floor - g_view_offset_floor) * 32,
 	];
 }
 // return [x, floor] on map
 function ScreenToMap(x, y) {
 	var map_pos = [
 		x / 16 - g_view_offset_x,
-		(g_canvas.height - y) / 32 + g_view_offset_floor
+		(g_canvas.height - y) / 32 + g_view_offset_floor,
 	];
 
 	var int_floor = Math.floor(map_pos[1]);
@@ -261,9 +269,9 @@ function Render() {
 	}
 
 	// Draw rooms
-	for (var floor_num = MIN_FLOOR; floor_num <= MAX_FLOOR; floor_num++) {
+	for (var floor_num = Building.MIN_FLOOR; floor_num <= Building.MAX_FLOOR; floor_num++) {
 		if (floor_num in g_room_floors) {
-			floor_data = g_room_floors[floor_num];
+			var floor_data = g_room_floors[floor_num];
 
 			for (var i = 0; i < floor_data.length; i++) {
 				var room = floor_data[i];
@@ -278,31 +286,31 @@ function Render() {
 	}
 
 	// Draw stairs
-	for (var floor_num = MAX_FLOOR; floor_num >= MIN_FLOOR; floor_num--) { // stairs overlap and need to be drawn from top to down
+	for (floor_num = Building.MAX_FLOOR; floor_num >= Building.MIN_FLOOR; floor_num--) { // stairs overlap and need to be drawn from top to down
 		if (floor_num in g_stair_floors) {
 			floor_data = g_stair_floors[floor_num];
 
-			for (var i = 0; i < floor_data.length; i++) {
+			for (i = 0; i < floor_data.length; i++) {
 				var stair = floor_data[i];
 				if (stair.def.id !== 'stair') continue;
-				var screen_pos = MapToScreen(stair.x, floor_num);
+				screen_pos = MapToScreen(stair.x, floor_num);
 
-				var add = '';
+				add = '';
 				MtImage.draw(stair.def.image + add, screen_pos[0], screen_pos[1] - 16);
 			}
 		}
 	}
 	// Draw elevators
-	for (var floor_num = MIN_FLOOR; floor_num <= MAX_FLOOR; floor_num++) { // elevators overlap (but other way than stairs) 
+	for (floor_num = Building.MIN_FLOOR; floor_num <= Building.MAX_FLOOR; floor_num++) { // elevators overlap (but other way than stairs) 
 		if (floor_num in g_stair_floors) {
 			floor_data = g_stair_floors[floor_num];
 
-			for (var i = 0; i < floor_data.length; i++) {
+			for (i = 0; i < floor_data.length; i++) {
 				var elevator = floor_data[i];
 				if (elevator.def.id !== 'elevator') continue;
-				var screen_pos = MapToScreen(elevator.x, floor_num);
+				screen_pos = MapToScreen(elevator.x, floor_num);
 
-				var add = '';
+				add = '';
 				MtImage.draw(elevator.def.image + add, screen_pos[0], screen_pos[1]);
 			}
 		}

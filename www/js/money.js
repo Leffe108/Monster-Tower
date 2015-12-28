@@ -1,4 +1,10 @@
+/**
+ * Module: Money
+ */
 
+/* global Animation, Room, g_bank_balance:true, g_simulation_time, g_room_floors, g_canvas */
+
+/* exported Money */
 var Money = (function() {
 
 	var init = function() {
@@ -6,14 +12,12 @@ var Money = (function() {
 	};
 
 	var update = function(time) {
-		// g_simulation_time repeat incrementing [0, 60*24] each day, but this works still
-		var prev = Math.floor((g_simulation_time - time) / (24 * 60));
-		var now = Math.floor((g_simulation_time / (24 *60))); 
+		// g_simulation_time repeat incrementing [0, 60*24] each day
 		if (g_simulation_time - time < 0) {
 			// New date
 
 			var balance_change = 0;
-			for(floor_num in g_room_floors) {
+			for(var floor_num in g_room_floors) {
 				var floor_data = g_room_floors[floor_num];
 				for (var i = 0; i < floor_data.length; i++) {
 					var room_data = floor_data[i];

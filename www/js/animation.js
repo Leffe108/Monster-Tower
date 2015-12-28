@@ -1,6 +1,10 @@
 /**
  * Module: Animation
  */
+
+/* global MtImage, g_context */
+/* eslint no-unused-vars: [2, {"args": "all", "varsIgnorePattern": "Animation"}] */
+
 var Animation = (function() {
 
 	var _ANIMATION_MAX_TIME = 2.0;

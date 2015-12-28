@@ -2,6 +2,9 @@
  * Utility functions
  */
 
+/* global g_context */
+/* exported assert, DrawRect, StrFirstToUpper, EncodeEntities */
+
 /**
  * From: http://stackoverflow.com/a/15313435
  */

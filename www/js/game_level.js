@@ -2,6 +2,10 @@
  * Monitor the game and decides how far you reached
  */
 
+/* global Building, Gui, Room, g_bank_balance, g_game_star_level:true, g_game_win_lose:true */
+/* global assert, PlaySoundEffect */
+
+/* exported GameLevel */
 var GameLevel = (function() {
 
 	var STAR1_MIN_OFFICE_RENTED = 10; // Min number of rented offices to get star 1
@@ -44,7 +48,7 @@ var GameLevel = (function() {
 		g_game_star_level = GSL_NO_STAR;
 	};
 
-	var update = function(time) {
+	var update = function() {
 		// Update Win/Lose
 		if (g_game_win_lose == GWL_WON_CONTINUE_PLAY) return;
 

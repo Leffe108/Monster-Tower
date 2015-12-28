@@ -2,6 +2,11 @@
  * Save/load
  */
 
+/* global Building, GameLevel, Room */
+/* global g_simulation_time:true, g_simulation_day:true, g_game_win_lose:true, g_game_star_level:true, g_stair_floors:true, g_bank_balance:true, g_room_floors:true, g_stair_floors:true, g_room_types */
+/* global InitGameState */
+
+/* exported SaveLoad */
 var SaveLoad = (function() {
 
 	/**
@@ -72,7 +77,7 @@ var SaveLoad = (function() {
 	 */
 	var _saveRoomListToJsonObj = function(floor_container) {
 		var result = {};
-		for (floor in floor_container) {
+		for (var floor in floor_container) {
 			result[floor] = [];
 			for (var i_room = 0; i_room < floor_container[floor].length; i_room++) {
 				var room = floor_container[floor][i_room];
@@ -98,11 +103,11 @@ var SaveLoad = (function() {
 	var _loadRoomFloorsFromJsonObj = function(floor_container) {
 		if (typeof floor_container !== 'object') return false;
 
-		for (floor in floor_container) {
+		for (var floor in floor_container) {
 			for (var i_room = 0; i_room < floor_container[floor].length; i_room++) {
 				var room = floor_container[floor][i_room];
 
-				if (!room.def in g_room_types) return false;
+				if (!(room.def in g_room_types)) return false;
 				room.def = g_room_types[room.def];
 				room.overlay_item = null;
 				if (!Room.validate(room)) return false;

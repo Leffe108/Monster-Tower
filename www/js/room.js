@@ -3,6 +3,10 @@
  *
  * Functions that work with room instances
  */
+
+/* global g_simulation_time, g_simulation_day, g_room_floors, g_stair_floors, g_reachable_floors */
+
+/* exported Room */
 var Room = (function() {
 
 	var ROOM_STATE_FOR_RENT = 'for-rent';
@@ -20,7 +24,7 @@ var Room = (function() {
 			// New hour
 
 			var k = 0;
-			for(floor_num in g_room_floors) {
+			for(var floor_num in g_room_floors) {
 				var floor_data = g_room_floors[floor_num];
 				for (var i = 0; i < floor_data.length; i++) {
 					var room_data = floor_data[i];
@@ -88,7 +92,7 @@ var Room = (function() {
 		var count = 0;
 
 		var floors_container = room_type === 'stair' ? g_stair_floors : g_room_floors;
-		for(floor_num in floors_container) {
+		for(var floor_num in floors_container) {
 			var floor_data = floors_container[floor_num];
 			for (var i = 0; i < floor_data.length; i++) {
 				var room_data = floor_data[i];
@@ -106,7 +110,7 @@ var Room = (function() {
 		var count = 0;
 
 		var floors_container = room_type === 'stair' ? g_stair_floors : g_room_floors;
-		for(floor_num in floors_container) {
+		for(var floor_num in floors_container) {
 			var floor_data = floors_container[floor_num];
 			for (var i = 0; i < floor_data.length; i++) {
 				var room_data = floor_data[i];

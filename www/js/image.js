@@ -5,7 +5,10 @@
  * drawing images until they have loaded.
  */
 
-MtImage = (function() {
+/*global RoomType, g_room_types, g_context, g_canvas*/
+/*eslint no-unused-vars: [2, {"args": "all", "varsIgnorePattern": "MtImage"}]*/
+
+var MtImage = (function() {
 
 	var _images = null;
 
@@ -47,7 +50,7 @@ MtImage = (function() {
 
 	/** Loads images based on defined room types. */
 	var loadRoomTypeImages = function() {
-		for (id in g_room_types) {
+		for (var id in g_room_types) {
 			_loadImage(g_room_types[id].image, 0, 0);
 			if (RoomType.isStairLayerRoom(id)) {
 				_loadImage(g_room_types[id].image + '-build-icon', 0, 0);

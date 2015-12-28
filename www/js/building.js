@@ -1,12 +1,18 @@
-
-var MIN_FLOOR = -5;
-var MAX_FLOOR = 100;
-
 /*
+ * Module: Building
+ *
  * Commands for altering building
  */
 
+/* global g_room_floors:true, g_stair_floors:true, g_reachable_floors:true, g_canvas, g_room_types, g_simulation_day */
+/* global Gui, Room, RoomType */
+/* global assert, MapToScreen, INITIAL_BUILDING */
+
+/* exported Building */
 var Building = (function() {
+
+	var MIN_FLOOR = -5;
+	var MAX_FLOOR = 100;
 
 	var init = function() {
 		g_room_floors = {};
@@ -86,7 +92,6 @@ var Building = (function() {
 			if (floor_data[i] === room_instance) {
 				floor_data.splice(i, 1);
 
-				var screen_pos = MapToScreen(room_instance.x, room_instance.floor_num);
 				Gui.removeOverlayItem(room_instance.overlay_item);
 				if (RoomType.isStairLayerRoom(room_instance.def.id)) rebuildReachableFloors();
 				return;
@@ -190,7 +195,7 @@ var Building = (function() {
 		}
 
 		// Downwards from entry level
-		for (var floor_num = 0; floor_num >= MIN_FLOOR; floor_num--) {
+		for (floor_num = 0; floor_num >= MIN_FLOOR; floor_num--) {
 			if ((floor_num - 1) in g_stair_floors && _hasFloorRoomOfType(g_stair_floors[floor_num-1], 'stair')) {
 				g_reachable_floors[floor_num - 1] = true;
 			} else if (_canReachAdjLevelByElevator(floor_num, -1)) {
@@ -201,10 +206,8 @@ var Building = (function() {
 		}
 
 		// Elevators are built as one unit per floor. And they need to be over each other to connect.
-		for (var floor_num = 0; floor_num <= MAX_FLOOR; floor_num++) {
+		for (floor_num = 0; floor_num <= MAX_FLOOR; floor_num++) {
 			if (!(floor_num in g_stair_floors)) continue;
-
-
 		}
 	};
 
@@ -296,7 +299,7 @@ var Building = (function() {
 
 		// Set x coords of is_covered to true if there is a room part
 		// exactly covering it
-		for (var i = 0; i < floor_data.length; i++) {
+		for (i = 0; i < floor_data.length; i++) {
 
 			for (var room_i_x = 0; room_i_x < floor_data[i].width; room_i_x++) {
 				var support_x = floor_data[i].x + room_i_x;
@@ -314,6 +317,11 @@ var Building = (function() {
 
 	// Export:
 	return {
+		/* consts */
+		MIN_FLOOR: MIN_FLOOR,
+		MAX_FLOOR: MAX_FLOOR,
+
+		/* functions */
 		init: init,
 		buildRoom: buildRoom,
 		addOverlayItemForRoom: addOverlayItemForRoom,
@@ -321,6 +329,5 @@ var Building = (function() {
 		canBuildRoomHere: canBuildRoomHere,
 		getBuildingHeight: getBuildingHeight,
 		rebuildReachableFloors: rebuildReachableFloors,
-
 	};
 })();

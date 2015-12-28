@@ -1,6 +1,10 @@
 /**
  * Module: Room type
  */
+
+/* global g_room_types:true */
+
+/* exported RoomType */
 var RoomType = (function() {
 
 	var init = function() {

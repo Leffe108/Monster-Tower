@@ -4,6 +4,7 @@ var watch = require('gulp-watch');
 var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var rename = require('gulp-rename');
+var eslint = require('gulp-eslint');
 
 /**
  * Runs a web server
@@ -49,7 +50,7 @@ gulp.task('webserver', function() {
 });
 
 // re-builds bundle and then cause browser to reload.
-gulp.task('on_js_change', ['bundle_js', 'minify_js'], function() {
+gulp.task('on_js_change', ['lint_js', 'bundle_js', 'minify_js'], function() {
 	browserSync.reload(); // reload full page.
 });
 
@@ -66,6 +67,12 @@ gulp.task('minify_js', ['bundle_js'], function() {
 		}))
 		.pipe(rename({extname: '.min.js'}))
 		.pipe(gulp.dest('./www/js/'));
+});
+
+gulp.task('lint_js', function() {
+	return gulp.src(['www/js/*.js', '!www/js/bundle.js', '!www/js/bundle.min.js', '!www/js/jquery-1.11.3.min.js'])
+		.pipe(eslint())
+		.pipe(eslint.format('compact'));
 });
 
 gulp.task('watch', function() {
