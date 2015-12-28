@@ -10,7 +10,7 @@ Monster Tower is a web game inspired by Sim Tower.
 # Story
 In the Netherlands there is a town called Monster. It want to show how much better it is there compared to its neighbours. So they decide to build a tall tower. Your job is to build that tower.
 
-# Contorls
+# Controls
 The game can be played using mouse (left button) or keyboard. It also has partial support for screen readers.
 
 ## Keyboard controls
