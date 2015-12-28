@@ -70,7 +70,7 @@ var Gui = (function() {
 		var a = $('<a tabindex="0">');
 		if (nav_type == 'room') {
 			a.on('click', function() {
-				showWindow(getRoomWindow(data));
+				roomClick(data);
 			});
 		} else if (nav_type == 'toolbar') {
 			a.on('click', function() {
@@ -301,6 +301,10 @@ var Gui = (function() {
 			MtImage.draw('view-right', x, 0, 0);
 			x += 32;
 		}
+	};
+
+	var roomClick = function(room_data) {
+		showWindow(getRoomWindow(room_data));
 	};
 
 	var toolbarClick = function(toolbar_button) {
