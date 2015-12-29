@@ -2,9 +2,9 @@
  * GUI related stuff
  */
 
-/* global Building, GameLevel, Money, Room, RoomType, SaveLoad, MtImage */
+/* global Building, GameLevel, Money, Room, RoomType, SaveLoad, MtImage, BuildNewCursor */
 /* global g_bank_balance:true, g_canvas, g_dirty_screen:true, g_logo_timer:true, g_game_star_level, g_room_types, g_room_floors, g_stair_floors, g_view_offset_x:true, g_view_offset_floor:true */
-/* global EncodeEntities, InitGameState, MapToScreen, MoneyStr, PlaySoundEffect, ScreenToMap, StrFirstToUpper, DISABLE_LOGO_INTRO:true */
+/* global EncodeEntities, InitGameState, MapToScreen, MoneyStr, StrFirstToUpper, DISABLE_LOGO_INTRO:true */
 /* exported g_dirty_screen, g_logo_timer, DISABLE_LOGO_INTRO */
 
 /* exported Gui */
@@ -18,8 +18,6 @@ var Gui = (function() {
 
 	var _open_windows = []; // list of open windows
 	var _toolbar_buildable_rooms = null; // array of rooms that can currently be built. The order affects toolbars
-	var _build_cursor_data = null; // object with data for the build new room cursor
-
 	/**
 	 * Initialize GUI-related stuff
 	 */
@@ -28,7 +26,6 @@ var Gui = (function() {
 
 		initGameOverOverlay();
 		initToolbar();
-		initBuildCursor();
 	};
 
 	/**
@@ -317,8 +314,7 @@ var Gui = (function() {
 				} else if (g_bank_balance < g_room_types[room_type].buy_cost) {
 					showCannotAffordWindow(g_room_types[room_type]);
 				} else {
-					setBuildCursorRoomType(g_room_types[room_type]);
-					switchOverlay(OVERLAY_BUILD_NEW);
+					BuildNewCursor.start(g_room_types[room_type]);
 				}
 				return;
 			}
@@ -337,260 +333,32 @@ var Gui = (function() {
 				break;
 			case 'view_up':
 				g_view_offset_floor++;
-				if (isBuildNewOverlayActive()) updateBuildCursorScreenPosition();
+				BuildNewCursor.updateScreenPosition();
 				rebuildNavOverlay();
 				break;
 			case 'view_down':
 				g_view_offset_floor--;
-				if (isBuildNewOverlayActive()) updateBuildCursorScreenPosition();
+				BuildNewCursor.updateScreenPosition();
 				rebuildNavOverlay();
 				break;
 			case 'view_left':
 				g_view_offset_x+= 5;
-				if (isBuildNewOverlayActive()) updateBuildCursorScreenPosition();
+				BuildNewCursor.updateScreenPosition();
 				rebuildNavOverlay();
 				break;
 			case 'view_right':
 				g_view_offset_x-= 5;
-				if (isBuildNewOverlayActive()) updateBuildCursorScreenPosition();
+				BuildNewCursor.updateScreenPosition();
 				rebuildNavOverlay();
 				break;
 			case 'abort_build_new':
-				_build_cursor_data.room_def = null;
-				switchOverlay(OVERLAY_NAV);
+				BuildNewCursor.abort();
 				break;
 			case 'game_star_level':
 				showWindow(getGameStarLevelWindow());
 				break;
 		}
 
-	};
-
-	/**
-	 * App startup initialization of build cursor.
-	 *
-	 * When starting to build a room type, call setBuildCursorRoomType to set up the cursor
-	 * width and other data specific to each room type.
-	 */
-	var initBuildCursor = function() {
-		var cursor = $('#gui-build-new-cursor');
-		var a = cursor.find('a');
-
-		_build_cursor_data = {
-			/* Map position of cursor */
-			x: 0,
-			floor: 0,
-
-			room_def: null, // Room def of type to build or null.
-			can_build: false, // True if room can be built at current cursor position, otherwise false.
-
-			dom: { // DOM elements of the cursor. Note: these are actually jQuery objcets.
-				cursor: cursor, // wrapper element
-				a: a,           // link <a>
-			},
-		};
-
-
-		/*
-		 * Arrow keys do not fire keypress on all browsers. So use 'keydown' event rather than 'keypress'
-		 * as not everyone feel at home with hjkl.
-		 */
-		a.on('keydown', function(e) {
-			if (e.which === 13) {
-				this.click();
-				e.preventDefault();
-				return;
-			}
-
-			var d_x = 0; 
-			var d_floor = 0;
-			switch (e.which) {
-				case 13: // Enter/return
-					this.click();
-					e.preventDefault();
-					return;
-
-				case 27: // Escape
-					_build_cursor_data.room_def = null;
-					switchOverlay(OVERLAY_NAV);
-					e.preventDefault();
-					return;
-
-				case 37: // Arrow left
-				case 72: // h
-					d_x--;
-					break;
-				case 40: // Arrow down
-				case 74: // j
-					d_floor--;
-					break;
-				case 38: // Arrow up
-				case 75: // k
-					d_floor++;
-					break;
-				case 39: // Arrow right
-				case 76: // l
-					d_x++;
-					break;
-			}
-
-			var ctrl_use = false;
-
-			// Move a whole room at the time if Ctrl key is depressed while using one of the arrow keys
-			if (e.ctrlKey && [37, 40, 38, 39].indexOf(e.which) !== -1) {
-				d_x *= _build_cursor_data.room_def.width;
-				d_floor *= 5;
-				ctrl_use = true;
-			}
-
-			// Avoid calling preventDefault when modifier key is depressed unless we make use of it.
-			// At least on Chrome this would disable default browser bindings like Ctrl+H => History
-			if (!ctrl_use && e.ctrlKey) return;
-			if (e.shiftKey) return;
-			if (e.altKey) return;
-
-			if (d_x !== 0 || d_floor !== 0) {
-				moveBuildCursor(d_x, d_floor);
-				e.preventDefault();
-			}
-		});
-
-		a.on('click', function() {
-			if (g_bank_balance < _build_cursor_data.room_def.buy_cost) {
-				showCannotAffordWindow(_build_cursor_data.room_def);
-				return;
-			}
-			if (Building.buildRoom(_build_cursor_data.room_def.id, _build_cursor_data.floor, _build_cursor_data.x)) {
-				g_bank_balance -= _build_cursor_data.room_def.buy_cost;
-				Money.animateCost();
-				PlaySoundEffect('build');
-
-				// Continue to build same room type - update cursor can build status
-				updateBuildCursorCanBuildStatus();
-			}
-		});
-
-		$('#gui-build-new-overlay').on('mousemove', function(e) {
-			var offset = $('#gui-build-new-overlay').offset();
-			var canvas_x = e.pageX - offset.left;
-			var canvas_y = e.pageY - offset.top;
-			if (canvas_y <= 32) return; // avoid moving the build cursor ontop of abort build toolbar button.
-			var map_pos = ScreenToMap(canvas_x, canvas_y);
-
-			// Adjust so room center follows mouse pointer.
-			var x = Math.floor(map_pos[0] - (_build_cursor_data.room_def.width - 0.5) / 2.0);
-			var floor = Math.floor(map_pos[1]);
-
-			setBuildCursorPosition(x, floor);
-		});
-	};
-
-	var drawBuildCursor = function() {
-		if (_build_cursor_data.room_def !== null && _build_cursor_data.can_build &&
-				_build_cursor_data.dom.cursor.find('a:focus').length !== 0) {
-			/* Draw room at cursor position. */
-			var room_def = _build_cursor_data.room_def;
-			var screen_pos = MapToScreen(_build_cursor_data.x, _build_cursor_data.floor);
-			var y_offset = room_def.id === 'stair' ? -16 : 0;
-			MtImage.draw(room_def.image, screen_pos[0], screen_pos[1] + y_offset);
-		}
-	};
-
-	/**
-	 * Move build cursor by delta x and delta floor.
-	 * @param d_x delta x
-	 * @param d_floor delta floor
-	 */
-	var moveBuildCursor = function(d_x, d_floor) {
-		setBuildCursorPosition(_build_cursor_data.x + d_x, _build_cursor_data.floor + d_floor);
-	};
-
-	/**
-	 * Move build cursor to given x and floor. If a position outside of the screen
-	 * is given it will be clamped so that the full room is visible within the screen.
-	 * @param x the map x coordinate
-	 * @param floor the map floor coordinate
-	 */
-	var setBuildCursorPosition = function(x, floor) {
-		var room_width = _build_cursor_data.room_def.width;
-
-		var screen_pos = MapToScreen(x, floor);
-
-		// Clamp position to be within screen
-		while (screen_pos[0] < 0) {
-			x++;
-			screen_pos = MapToScreen(x, floor);
-		}
-		while (screen_pos[0] + room_width * 16 > g_canvas.width) {
-			x--;
-			screen_pos = MapToScreen(x, floor);
-		}
-		while (screen_pos[1] < 31) { // do not allow positioning on the top toolbar row
-			floor--;
-			screen_pos = MapToScreen(x, floor);
-		}
-		while (screen_pos[1] + 32 > g_canvas.height) {
-			floor++;
-			screen_pos = MapToScreen(x, floor);
-		}
-
-		if (x !== _build_cursor_data.x || floor !== _build_cursor_data.floor) {
-			_build_cursor_data.x = x;
-			_build_cursor_data.floor = floor;
-
-			(function(){
-				var cursor = _build_cursor_data.dom.cursor;
-				cursor.css('left', screen_pos[0]);
-				cursor.css('top', screen_pos[1]);
-			})();
-
-			updateBuildCursorCanBuildStatus();
-		}
-	};
-
-	/**
-	 * Updates build cursor regarding if room can be built at current position.
-	 */
-	var updateBuildCursorCanBuildStatus = function() {
-		var cursor = _build_cursor_data.dom.cursor;
-		var a = _build_cursor_data.dom.a;
-
-		_build_cursor_data.can_build = Building.canBuildRoomHere(_build_cursor_data.room_def.id, _build_cursor_data.x, _build_cursor_data.floor);
-		if (_build_cursor_data.can_build) {
-			cursor.addClass('can-build');
-			cursor.removeClass('cannot-build');
-			a.attr('title', 'Build ' + _build_cursor_data.room_def.name);
-		} else {
-			cursor.removeClass('can-build');
-			cursor.addClass('cannot-build');
-			a.attr('title', 'Cannot build ' + _build_cursor_data.room_def.name + ' here');
-		}
-
-	};
-
-	/**
-	 * Updates the position of the build cursor. Eg. after view scroll
-	 */
-	var updateBuildCursorScreenPosition = function() {
-		setBuildCursorPosition(_build_cursor_data.x, _build_cursor_data.floor);
-	};
-
-	/**
-	 * Set the room type that the build new cursor will build
-	 * @param room_def the room definition of the room
-	 */
-	var setBuildCursorRoomType = function(room_def) {
-		_build_cursor_data.room_def = room_def;
-
-		var cursor = _build_cursor_data.dom.cursor;
-		var a = _build_cursor_data.dom.a;
-
-		a.css('width',  (room_def.width * 16) + 'px');
-		var screen_pos = MapToScreen(_build_cursor_data.x, _build_cursor_data.floor);
-		cursor.css('left', screen_pos[0]);
-		cursor.css('top', screen_pos[1]);
-
-		updateBuildCursorCanBuildStatus();
 	};
 
 	var showCannotAffordWindow = function(room_def) {
@@ -1145,13 +913,10 @@ var Gui = (function() {
 		/* functions */
 		init: init,
 		switchOverlay: switchOverlay,
-		drawBuildCursor: drawBuildCursor,
 		drawToolbar: drawToolbar,
 		addOverlayItem: addOverlayItem,
 		removeOverlayItem: removeOverlayItem,
 		rebuildToolbars: rebuildToolbars,
-
-		updateBuildCursorScreenPosition: updateBuildCursorScreenPosition,
 
 		isGameOverOverlayActive: isGameOverOverlayActive,
 		isBuildNewOverlayActive: isBuildNewOverlayActive,
@@ -1163,6 +928,7 @@ var Gui = (function() {
 		closeTopWindow: closeTopWindow,
 		positionWindows: positionWindows,
 		showWindow: showWindow,
+		showCannotAffordWindow: showCannotAffordWindow,
 
 		setGameAriaLiveText: setGameAriaLiveText,
 	};

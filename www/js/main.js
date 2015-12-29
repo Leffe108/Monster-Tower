@@ -2,7 +2,7 @@
  * Main
  */
 
-/* global Animation, Building, GameLevel, Gui, Money, MtImage, Room, RoomType */
+/* global Animation, Building, GameLevel, Gui, Money, BuildNewCursor, MtImage, Room, RoomType */
 /* global assert, DrawRect */
 /* exported g_game_win_lose, g_game_star_level, g_reachable_floors, g_floor_stair_distance, g_room_types */
 /* exported INITIAL_BUILDING */
@@ -65,7 +65,7 @@ function InitCanvas() {
 		ResizeCanvas();
 		Gui.positionWindows();
 		Gui.rebuildToolbars();
-		if (Gui.isBuildNewOverlayActive()) Gui.updateBuildCursorScreenPosition();
+		BuildNewCursor.updateScreenPosition();
 		Gui.rebuildNavOverlay();
 	};
 }
@@ -316,7 +316,7 @@ function Render() {
 		}
 	}
 
-	Gui.drawBuildCursor();
+	BuildNewCursor.draw();
 	Gui.drawToolbar();
 
 	// Draw animations
@@ -364,6 +364,7 @@ function Init() {
 	MtImage.loadStatic();
 	InitGameState();
 	Animation.init();
+	BuildNewCursor.init();
 	Gui.init();
 	MtImage.loadRoomTypeImages();
 
