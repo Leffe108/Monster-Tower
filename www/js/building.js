@@ -43,7 +43,7 @@ var Building = (function() {
 		var room_def = g_room_types[room_type];
 
 		// Has free spot?
-		var insert_index = _getRoomInsertIndex(floors_container, floor_data, x, room_def.width);
+		var insert_index = _getRoomInsertIndex(floor_data, x, room_def.width);
 		if (insert_index === false) {
 			return false;
 		}
@@ -115,7 +115,7 @@ var Building = (function() {
 		if (floor_num in g_room_floors) {
 			// if existing floor, check for conflict with rooms
 			var floor_data = g_room_floors[floor_num];
-			if (!_isFloorFreeForRoomHere(g_room_floors, floor_data, x, room_def.width)) {
+			if (!_isFloorFreeForRoomHere(floor_data, x, room_def.width)) {
 				return false;
 			}
 		}
@@ -156,7 +156,7 @@ var Building = (function() {
 		// Check for conflict with other stairs
 		if (floor_num in g_stair_floors) {
 			var floor_data = g_stair_floors[floor_num];
-			if (!_isFloorFreeForRoomHere(g_stair_floors, floor_data, x, room_def.width)) {
+			if (!_isFloorFreeForRoomHere(floor_data, x, room_def.width)) {
 				return false;
 			}
 		}
@@ -224,8 +224,8 @@ var Building = (function() {
 		return floors_container[floor_num];
 	};
 
-	var _isFloorFreeForRoomHere = function(floors_container, floor_data, room_x, room_width) {
-		return _getRoomInsertIndex(floors_container, floor_data, room_x, room_width) !== false;
+	var _isFloorFreeForRoomHere = function(floor_data, room_x, room_width) {
+		return _getRoomInsertIndex(floor_data, room_x, room_width) !== false;
 	};
 
 	/*
@@ -233,7 +233,7 @@ var Building = (function() {
 	 * If there is not space for a new room, boolean false is
 	 * returned.
 	 */
-	var _getRoomInsertIndex = function(floors_container, floor_data, room_x, room_width) {
+	var _getRoomInsertIndex = function(floor_data, room_x, room_width) {
 		if (floor_data.length <= 0) return 0;
 		if (room_x + room_width <= floor_data[0].x) return 0;
 		if (floor_data[floor_data.length-1].x + floor_data[floor_data.length-1].width <= room_x) return floor_data.length;
