@@ -53,7 +53,7 @@ var Animation = (function() {
 	 */
 	var hasAny = function() {
 		return _animations.length;
-	}
+	};
 
 	/**
 	 * Draws all Animations
