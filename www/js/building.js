@@ -76,7 +76,7 @@ var Building = (function() {
 		var screen_pos = MapToScreen(room_data.x, room_data.floor);
 		if (screen_pos[1] >= g_canvas.height) return;
 		var width = Math.min(screen_pos[0] + room_data.width * 16, g_canvas.width) - screen_pos[0];
-		room_data.overlay_item = Gui.addOverlayItem(room_data, room_data.def.name, screen_pos[0], screen_pos[1], width, 'nav', 'room');
+		room_data.overlay_item = Gui.addOverlayItem(room_data, room_data.def.name, screen_pos[0], screen_pos[1], width, 'nav', RoomType.isStairLayerRoom(room_data.def.id) ? 'stair' : 'room');
 	};
 
 	/**

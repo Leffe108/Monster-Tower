@@ -25,8 +25,11 @@
 #gui-nav-overlay, #gui-build-new-overlay, #gui-game-over-overlay {
 	z-index: 2;
 }
+#gui-nav-overlay [data-nav-type="stair"] {
+	z-index: 3 !important; // stair layer rooms need to be infront of other rooms
+}
 #gui-window-overlay {
-	z-index: 3;
+	z-index: 4;
 }
 
 /* Nav overlay */

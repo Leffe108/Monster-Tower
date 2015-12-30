@@ -56,7 +56,7 @@ var Gui = (function() {
 	 *
 	 * overlay: 'nav' or 'build-new'
 	 * nav_type:
-	 *   'nav' overlay has: 'room', 'toolbar'
+	 *   'nav' overlay has: 'room', 'stair', 'toolbar'
 	 *   'build-new' overlay has: 'toolbar'
 	 */
 	var addOverlayItem = function(data, title, screen_x, screen_y, screen_width, overlay, nav_type) {
@@ -65,7 +65,7 @@ var Gui = (function() {
 		var container = $('#' + overlay_id).find('ul[data-nav-type=' + nav_type + ']');
 		var li = $('<li class="gui-overlay-item">');
 		var a = $('<a tabindex="0">');
-		if (nav_type == 'room') {
+		if (nav_type === 'room' || nav_type === 'stair') {
 			a.on('click', function() {
 				roomClick(data);
 			});
@@ -212,6 +212,7 @@ var Gui = (function() {
 	var rebuildNavOverlay = function() {
 
 		$('#gui-nav-overlay').find('ul[data-nav-type=room]').find('li').remove();
+		$('#gui-nav-overlay').find('ul[data-nav-type=stair]').find('li').remove();
 
 		for (var floor_num = Building.MIN_FLOOR; floor_num <= Building.MAX_FLOOR; floor_num++) {
 			var floor_containers = [g_room_floors, g_stair_floors];
