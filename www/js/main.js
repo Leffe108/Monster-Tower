@@ -16,6 +16,7 @@ var g_view_offset_x = null;
 var g_context = null;
 var g_dirty_screen = null; // needs redraw? true/false
 var g_logo_timer = null;
+var g_intro_aria_set = null;
 var g_simulation_time = null; // unit: minutes (total 24*60 a day)
 var g_simulation_day = null; // day counter
 var g_game_win_lose = null; // WL_* from game_level.js
@@ -120,6 +121,10 @@ function Update(time) {
 
 	// Still showing the logo?
 	if (g_logo_timer >= 0 && !DISABLE_LOGO_INTRO) {
+		if (g_intro_aria_set === false && g_logo_timer > 0) {
+			Gui.setGameAriaLiveText('Game intro: A map of Netherlands is displayed. A small town Monster is shown south-west of The Hague and Amsterdam.');
+			g_intro_aria_set = true;
+		}
 		g_logo_timer += gui_time;
 		g_dirty_screen = true;
 		if (g_logo_timer > 3) {
@@ -127,6 +132,7 @@ function Update(time) {
 			Gui.setGameAriaLiveText('Intro is over. Game world now shows and ontop of that a window.');
 			Gui.showWindow(Gui.getIntroWindow());
 		} else {
+
 			return; // continue to show logo - don't update game state
 		}
 	}
@@ -359,6 +365,7 @@ function Main() {
 
 function Init() {
 	g_logo_timer = 0;
+	g_intro_aria_set = false;
 	InitCanvas();
 	MtImage.init();
 	MtImage.loadStatic();
@@ -370,8 +377,6 @@ function Init() {
 
 	if (DISABLE_LOGO_INTRO) {
 		Gui.switchOverlay(Gui.OVERLAY_NAV);
-	} else {
-		Gui.setGameAriaLiveText('Game intro: A map of Netherlands is displayed. A small town Monster is shown south-west of The Hague and Amsterdam.');
 	}
 
 	// Cross-browser support for requestAnimationFrame

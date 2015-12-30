@@ -3,7 +3,7 @@
  */
 
 /* global Building, GameLevel, Money, Room, RoomType, SaveLoad, MtImage, BuildNewCursor */
-/* global g_bank_balance:true, g_canvas, g_dirty_screen:true, g_logo_timer:true, g_game_star_level, g_room_types, g_room_floors, g_stair_floors, g_view_offset_x:true, g_view_offset_floor:true */
+/* global g_bank_balance:true, g_canvas, g_dirty_screen:true, g_logo_timer:true, g_game_star_level, g_room_types, g_room_floors, g_stair_floors, g_view_offset_x:true, g_view_offset_floor:true, g_intro_aria_set:true */
 /* global EncodeEntities, InitGameState, MapToScreen, MoneyStr, StrFirstToUpper, DISABLE_LOGO_INTRO:true */
 /* exported g_dirty_screen, g_logo_timer, DISABLE_LOGO_INTRO */
 
@@ -844,6 +844,7 @@ var Gui = (function() {
 				switch (widget_name) {
 					case 'show_intro':
 						g_logo_timer = 0;
+						g_intro_aria_set = false;
 						DISABLE_LOGO_INTRO = false;
 						closeTopWindow();
 						break;
