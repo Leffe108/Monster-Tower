@@ -5,13 +5,24 @@
 /* global g_context */
 /* exported assert, DrawRect, StrFirstToUpper, EncodeEntities */
 
+/* eslint no-console: 0 */
+
 /**
- * From: http://stackoverflow.com/a/15313435
+ * Complains if condition doesn't hold.
+ * @param condition
+ * @param message The message to display if condition doesn't hold. Optional.
+ * @return void
  */
 function assert(condition, message) {
-    if (!condition) {
-        throw message || "Assertion failed";
-    }
+	// Use console.assert if browser has it.
+	if (typeof console.assert === 'function') {
+		console.assert(condition, message);
+	} else {
+		// Solution from: http://stackoverflow.com/a/15313435
+		if (!condition) {
+			throw message || "Assertion failed";
+		}
+	}
 }
 
 /**
