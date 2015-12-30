@@ -858,7 +858,6 @@ var Gui = (function() {
 						closeTopWindow();
 						rebuildToolbars();
 						rebuildNavOverlay();
-						if (isBuildNewOverlayActive()) switchOverlay(OVERLAY_NAV);
 						break;
 
 					case 'load_json_game':
@@ -872,7 +871,6 @@ var Gui = (function() {
 						}
 						rebuildToolbars();
 						rebuildNavOverlay();
-						if (isBuildNewOverlayActive()) switchOverlay(OVERLAY_NAV);
 						break;
 				}
 		}
