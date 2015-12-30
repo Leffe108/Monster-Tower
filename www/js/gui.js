@@ -589,7 +589,7 @@ var Gui = (function() {
 			new WidLabel(
 				'The mayor think it should be nice if it had a ' +
 				'large tower to show its larger neighbour how ' +
-				'much better it is in Monster', 'left'
+				'much better it is in Monster.', 'left'
 			),
 			new WidSpacer(),
 			new WidLabel(

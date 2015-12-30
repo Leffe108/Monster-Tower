@@ -122,14 +122,14 @@ function Update(time) {
 	// Still showing the logo?
 	if (g_logo_timer >= 0 && !DISABLE_LOGO_INTRO) {
 		if (g_intro_aria_set === false && g_logo_timer > 0) {
-			Gui.setGameAriaLiveText('Game intro: A map of Netherlands is displayed. A small town Monster is shown south-west of The Hague and Amsterdam.');
+			Gui.setGameAriaLiveText('Game intro: A map of Netherlands is displayed. A small town Monster is shown south-west of The Hague and Amsterdam. ');
 			g_intro_aria_set = true;
 		}
 		g_logo_timer += gui_time;
 		g_dirty_screen = true;
 		if (g_logo_timer > 3) {
 			g_logo_timer = -1;
-			Gui.setGameAriaLiveText('Intro is over. Game world now shows and ontop of that a window.');
+			Gui.setGameAriaLiveText('Intro is over. Game world now shows and ontop of that a window. ');
 			Gui.showWindow(Gui.getIntroWindow());
 		} else {
 
