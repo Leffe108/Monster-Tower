@@ -108,6 +108,10 @@ var BuildNewCursor = (function() {
 			_cursorClick();
 		});
 
+		a.on('mouseenter', function() {
+			a.focus();
+		});
+
 		var overlay = $('#gui-build-new-overlay');
 		assert(overlay.length !== 0, 'overlay not found');
 		overlay.on('mousemove', function(e) {
