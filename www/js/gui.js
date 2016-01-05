@@ -179,12 +179,12 @@ var Gui = (function() {
 			x = 0;
 			if (overlay === 'build-new') {
 				addOverlayItem({
-					id:  'abort_build_new',
+					id:  'stop_build_new',
 				}, 'Stop building more', x, 0, 32, overlay, 'toolbar');
 				x += 32;
 			} else {
 				addOverlayItem({
-					id:  'abort_edit_elevator',
+					id:  'stop_edit_elevator',
 				}, 'Stop editing elevator shaft', x, 0, 32, overlay, 'toolbar');
 				x += 32;
 			}
@@ -376,8 +376,8 @@ var Gui = (function() {
 				EditElevatorCursor.updateScreenPosition();
 				rebuildNavOverlay();
 				break;
-			case 'abort_build_new':
-				BuildNewCursor.abort();
+			case 'stop_build_new':
+				BuildNewCursor.stop();
 				break;
 			case 'game_star_level':
 				showWindow(getGameStarLevelWindow());

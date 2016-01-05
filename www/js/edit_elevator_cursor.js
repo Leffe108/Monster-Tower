@@ -63,7 +63,7 @@ var EditElevatorCursor = (function() {
 					return;
 
 				case 27: // Escape
-					abort();
+					stop();
 					e.preventDefault();
 					return;
 
@@ -111,7 +111,7 @@ var EditElevatorCursor = (function() {
 			var offset = overlay.offset();
 			var canvas_x = e.pageX - offset.left;
 			var canvas_y = e.pageY - offset.top;
-			if (canvas_y <= 32) return; // avoid moving the build cursor ontop of abort build toolbar button.
+			if (canvas_y <= 32) return; // avoid moving the build cursor ontop of stop edit elevator toolbar button.
 			var map_pos = ScreenToMap(canvas_x, canvas_y);
 
 			var floor = Math.floor(map_pos[1]);
@@ -119,7 +119,7 @@ var EditElevatorCursor = (function() {
 		});
 
 		overlay.on('click', function() {
-			abort();
+			stop();
 		});
 
 	};
@@ -297,9 +297,9 @@ var EditElevatorCursor = (function() {
 	};
 
 	/**
-	 * Abort the edit elevator cursor
+	 * Stop edit elevator cursor and return to nav overlay
 	 */
-	var abort = function() {
+	var stop = function() {
 		_cursor_data.elevator = null;
 		_cursor_data.edit_end = null;
 		Gui.switchOverlay(Gui.OVERLAY_NAV);
@@ -312,7 +312,7 @@ var EditElevatorCursor = (function() {
 		updateScreenPosition: updateScreenPosition,
 
 		start: start,
-		abort: abort,
+		stop: stop,
 	};
 })();
 

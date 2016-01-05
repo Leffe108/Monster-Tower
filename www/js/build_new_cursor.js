@@ -61,7 +61,7 @@ var BuildNewCursor = (function() {
 					return;
 
 				case 27: // Escape
-					abort();
+					stop();
 					e.preventDefault();
 					return;
 
@@ -114,7 +114,7 @@ var BuildNewCursor = (function() {
 			var offset = overlay.offset();
 			var canvas_x = e.pageX - offset.left;
 			var canvas_y = e.pageY - offset.top;
-			if (canvas_y <= 32) return; // avoid moving the build cursor ontop of abort build toolbar button.
+			if (canvas_y <= 32) return; // avoid moving the build cursor ontop of stop build toolbar button.
 			var map_pos = ScreenToMap(canvas_x, canvas_y);
 
 			// Adjust so cursor center follows mouse pointer.
@@ -141,7 +141,7 @@ var BuildNewCursor = (function() {
 
 			if (RoomType.isElevator(_cursor_data.room_def.id)) {
 				// User probably want to adjust elevator floor range after building it
-				abort();
+				stop();
 			} else {
 				// Continue to build same room type - update cursor can build status
 				_updateCanBuildStatus();
@@ -279,9 +279,9 @@ var BuildNewCursor = (function() {
 	};
 
 	/**
-	 * Abort the build new cursor
+	 * Stop the build new cursor and return to nav overlay
 	 */
-	var abort = function() {
+	var stop = function() {
 		_cursor_data.room_def = null;
 		Gui.switchOverlay(Gui.OVERLAY_NAV);
 	};
@@ -294,6 +294,6 @@ var BuildNewCursor = (function() {
 		updateScreenPosition: updateScreenPosition,
 
 		start: start,
-		abort: abort,
+		stop: stop,
 	};
 })();
