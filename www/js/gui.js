@@ -30,7 +30,8 @@ var Gui = (function() {
 	};
 
 	/**
-	 * @param overlay OVERLAY_WINDOWS or OVERLAY_NAV
+	 * Switch visible overlay.
+	 * @param overlay OVERLAY_WINDOWS, OVERLAY_NAV, OVERLAY_BUILD_NEW, OVERLAY_EDIT_ELEVATOR or OVERLAY_GAME_OVER.
 	 */
 	var switchOverlay = function(overlay) {
 		$('#gui-nav-overlay').addClass('hidden');
