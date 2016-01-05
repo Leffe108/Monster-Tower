@@ -2,7 +2,7 @@ Monster Tower
 =============
 Monster Tower is a web game inspired by Sim Tower. 
 
-![Screenshot of a tower built in Monster Tower game](https://raw.githubusercontent.com/Leffe108/Monster-Tower/master/screenshot-2.png)
+![Screenshot of a tower built in Monster Tower game](https://raw.githubusercontent.com/Leffe108/Monster-Tower/master/screenshot-4.png)
 
 # Play game
 [Play game in my browser](http://junctioneer.net/monster-tower/)
