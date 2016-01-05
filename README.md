@@ -28,4 +28,4 @@ Escape     | Build&nbsp;room* | Abort building more rooms of current room type.
 I have tried to support screen readers, but I'm not a regular screen reader user myself. If you have ideas on how to improve it, please get in touch.
 
 # Ludum Dare 33
-This game was made as an [entry](http://ludumdare.com/compo/ludum-dare-33/?action=preview&uid=38630) for the Ludum Dare 33 game development competition.
+This game was originally made as an [entry](http://ludumdare.com/compo/ludum-dare-33/?action=preview&uid=38630) for the Ludum Dare 33 game development competition.
