@@ -2,7 +2,7 @@
  * Module: Money
  */
 
-/* global Animation, Room, g_bank_balance:true, g_simulation_time, g_room_floors, g_stair_floors, g_canvas */
+/* global Animation, Room, RoomType, g_bank_balance:true, g_simulation_time, g_room_floors, g_stair_floors, g_canvas */
 
 /* exported Money */
 var Money = (function() {
@@ -24,6 +24,11 @@ var Money = (function() {
 					var floor_data = floor_container[floor_num];
 					for (var i = 0; i < floor_data.length; i++) {
 						var room_data = floor_data[i];
+
+						// Only charge once for each elevator
+						if (RoomType.isElevator(room_data.def.id) && room_data.pieceName !== 'top') {
+							continue;
+						}
 
 						balance_change -= room_data.def.maint_cost;
 						if (room_data.state !== Room.ROOM_STATE_FOR_RENT) {
