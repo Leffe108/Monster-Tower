@@ -5,7 +5,7 @@
  * With it the user can select a location in the map to perform an action.
  */
 
-/* global Building, Gui, Money, MtImage */
+/* global Building, Gui, Money, MtImage, RoomType */
 /* global g_canvas, g_bank_balance:true */
 /* global assert, MapToScreen, ScreenToMap, PlaySoundEffect */
 
@@ -139,8 +139,13 @@ var BuildNewCursor = (function() {
 			Money.animateCost();
 			PlaySoundEffect('build');
 
-			// Continue to build same room type - update cursor can build status
-			_updateCanBuildStatus();
+			if (RoomType.isElevator(_cursor_data.room_def.id)) {
+				// User probably want to adjust elevator floor range after building it
+				abort();
+			} else {
+				// Continue to build same room type - update cursor can build status
+				_updateCanBuildStatus();
+			}
 		}
 	};
 
