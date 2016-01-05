@@ -40,9 +40,9 @@ var RoomType = (function() {
 			name: 'Elevator',
 			image: 'elevator',
 			width: 48/16,
-			buy_cost: 4000,
+			buy_cost: 15000,
 			demolish_cost: 50,
-			maint_cost: 2000,
+			maint_cost: 3000,
 			rent_income: 0,
 			min_stars: 2,
 			elevator_max_floor_range: 20, // Maximum number of floors to cover (excluding bottom/top piece)
