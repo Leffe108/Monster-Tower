@@ -12,7 +12,16 @@
 /* exported BuildNewCursor */
 var BuildNewCursor = (function() {
 
-	var _cursor_data = null; // data for the build new room cursor
+	var _x = null;        // Map x coordinate of cursor
+	var _floor = null;    // Map floor of cursor
+
+	var _room_def = null;  // Room def of type to build or null.
+	var _can_build = null; // True if cursor action can execute at current location
+
+	var _dom = { // DOM elements of the cursor. Note: these are actually jQuery objcets.
+		cursor: null, // wrapper element
+		a: null,      // link <a>
+	};
 
 	/**
 	 * App startup initialization of cursor.
@@ -21,25 +30,17 @@ var BuildNewCursor = (function() {
 	 * width and other data specific to each room type.
 	 */
 	var init = function() {
-		_cursor_data = {};
-
 		var cursor = $('#gui-build-new-cursor');
 		assert(cursor.length !== 0);
 		var a = cursor.find('a');
 
-		_cursor_data = {
-			/* Map position of cursor */
-			x: 0,
-			floor: 0,
-
-			room_def: null, // Room def of type to build or null.
-			can_build: false, // True if cursor action can execute at current location
-
-			dom: { // DOM elements of the cursor. Note: these are actually jQuery objcets.
-				cursor: cursor, // wrapper element
-				a: a,           // link <a>
-			},
-		};
+		/* Initialize cursor data. */
+		_x = 0;
+		_floor = 0;
+		_room_def = null;
+		_can_build = false;
+		_dom.cursor = cursor;
+		_dom.a = a;
 
 		/*
 		 * Arrow keys do not fire keypress on all browsers. So use 'keydown' event rather than 'keypress'
@@ -87,7 +88,7 @@ var BuildNewCursor = (function() {
 
 			// Move a whole cursor width at the time if Ctrl key is depressed while using one of the arrow keys
 			if (e.ctrlKey && [37, 40, 38, 39].indexOf(e.which) !== -1) {
-				d_x *= _cursor_data.room_def.width;
+				d_x *= _room_def.width;
 				d_floor *= 5;
 				ctrl_use = true;
 			}
@@ -122,7 +123,7 @@ var BuildNewCursor = (function() {
 			var map_pos = ScreenToMap(canvas_x, canvas_y);
 
 			// Adjust so cursor center follows mouse pointer.
-			var x = Math.floor(map_pos[0] - (_cursor_data.room_def.width - 0.5) / 2.0);
+			var x = Math.floor(map_pos[0] - (_room_def.width - 0.5) / 2.0);
 			var floor = Math.floor(map_pos[1]);
 
 			_setCursorPosition(x, floor);
@@ -133,17 +134,17 @@ var BuildNewCursor = (function() {
 	 * Click handler for cursor. Handles both mouse click and keyboard enter key.
 	 */
 	var _cursorClick = function() {
-		assert(_cursor_data.room_def !== null, 'Build cursor has no room type');
-		if (g_bank_balance < _cursor_data.room_def.buy_cost) {
-			Gui.showCannotAffordWindow(_cursor_data.room_def);
+		assert(_room_def !== null, 'Build cursor has no room type');
+		if (g_bank_balance < _room_def.buy_cost) {
+			Gui.showCannotAffordWindow(_room_def);
 			return;
 		}
-		if (Building.buildRoom(_cursor_data.room_def.id, _cursor_data.floor, _cursor_data.x)) {
-			g_bank_balance -= _cursor_data.room_def.buy_cost;
+		if (Building.buildRoom(_room_def.id, _floor, _x)) {
+			g_bank_balance -= _room_def.buy_cost;
 			Money.animateCost();
 			PlaySoundEffect('build');
 
-			if (RoomType.isElevator(_cursor_data.room_def.id)) {
+			if (RoomType.isElevator(_room_def.id)) {
 				// User probably want to adjust elevator floor range after building it
 				stop();
 			} else {
@@ -159,11 +160,11 @@ var BuildNewCursor = (function() {
 	var draw = function() {
 		if (!_isVisible()) return;
 
-		if (_cursor_data.room_def !== null && _cursor_data.can_build &&
-				_cursor_data.dom.cursor.find('a:focus').length !== 0) {
+		if (_room_def !== null && _can_build &&
+				_dom.cursor.find('a:focus').length !== 0) {
 			/* Build cursor: Draw room at cursor position. */
-			var room_def = _cursor_data.room_def;
-			var screen_pos = MapToScreen(_cursor_data.x, _cursor_data.floor);
+			var room_def = _room_def;
+			var screen_pos = MapToScreen(_x, _floor);
 			var y_offset = room_def.id === 'stair' ? -16 : 0;
 			MtImage.draw(room_def.image, screen_pos[0], screen_pos[1] + y_offset);
 		}
@@ -175,7 +176,7 @@ var BuildNewCursor = (function() {
 	 * @param d_floor delta floor
 	 */
 	var _moveCursor = function(d_x, d_floor) {
-		_setCursorPosition(_cursor_data.x + d_x, _cursor_data.floor + d_floor);
+		_setCursorPosition(_x + d_x, _floor + d_floor);
 	};
 
 	/**
@@ -192,7 +193,7 @@ var BuildNewCursor = (function() {
 			x++;
 			screen_pos = MapToScreen(x, floor);
 		}
-		while (screen_pos[0] + _cursor_data.room_def.width * 16 > g_canvas.width) {
+		while (screen_pos[0] + _room_def.width * 16 > g_canvas.width) {
 			x--;
 			screen_pos = MapToScreen(x, floor);
 		}
@@ -205,12 +206,12 @@ var BuildNewCursor = (function() {
 			screen_pos = MapToScreen(x, floor);
 		}
 
-		if (x !== _cursor_data.x || floor !== _cursor_data.floor) {
-			_cursor_data.x = x;
-			_cursor_data.floor = floor;
+		if (x !== _x || floor !== _floor) {
+			_x = x;
+			_floor = floor;
 
 			(function(){
-				var cursor = _cursor_data.dom.cursor;
+				var cursor = _dom.cursor;
 				cursor.css('left', screen_pos[0]);
 				cursor.css('top', screen_pos[1]);
 			})();
@@ -225,7 +226,7 @@ var BuildNewCursor = (function() {
 	 */
 	var updateScreenPosition = function() {
 		if (_isVisible()) {
-			_setCursorPosition(_cursor_data.x, _cursor_data.floor);
+			_setCursorPosition(_x, _floor);
 		}
 	};
 
@@ -233,25 +234,25 @@ var BuildNewCursor = (function() {
 	 * Check if cursor is visible
 	 */
 	var _isVisible = function() {
-		return !_cursor_data.dom.cursor.parent().hasClass('hidden');
+		return !_dom.cursor.parent().hasClass('hidden');
 	};
 
 	/**
 	 * Updates build cursor regarding if room can be built at current position.
 	 */
 	var _updateCanBuildStatus = function() {
-		var cursor = _cursor_data.dom.cursor;
-		var a = _cursor_data.dom.a;
+		var cursor = _dom.cursor;
+		var a = _dom.a;
 
-		_cursor_data.can_build = Building.canBuildRoomHere(_cursor_data.room_def.id, _cursor_data.x, _cursor_data.floor);
-		if (_cursor_data.can_build) {
+		_can_build = Building.canBuildRoomHere(_room_def.id, _x, _floor);
+		if (_can_build) {
 			cursor.addClass('can-build');
 			cursor.removeClass('cannot-build');
-			a.attr('title', 'Build ' + _cursor_data.room_def.name);
+			a.attr('title', 'Build ' + _room_def.name);
 		} else {
 			cursor.removeClass('can-build');
 			cursor.addClass('cannot-build');
-			a.attr('title', 'Cannot build ' + _cursor_data.room_def.name + ' here');
+			a.attr('title', 'Cannot build ' + _room_def.name + ' here');
 		}
 	};
 
@@ -260,13 +261,13 @@ var BuildNewCursor = (function() {
 	 * @param room_def the room definition of the room
 	 */
 	var _setBuildCursorRoomType = function(room_def) {
-		_cursor_data.room_def = room_def;
+		_room_def = room_def;
 
-		var cursor = _cursor_data.dom.cursor;
-		var a = _cursor_data.dom.a;
+		var cursor = _dom.cursor;
+		var a = _dom.a;
 
 		a.css('width',  (room_def.width * 16) + 'px');
-		var screen_pos = MapToScreen(_cursor_data.x, _cursor_data.floor);
+		var screen_pos = MapToScreen(_x, _floor);
 		cursor.css('left', screen_pos[0]);
 		cursor.css('top', screen_pos[1]);
 
@@ -286,7 +287,7 @@ var BuildNewCursor = (function() {
 	 * Stop the build new cursor and return to nav overlay
 	 */
 	var stop = function() {
-		_cursor_data.room_def = null;
+		_room_def = null;
 		Gui.switchOverlay(Gui.OVERLAY_NAV);
 	};
 

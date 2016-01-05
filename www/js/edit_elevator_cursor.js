@@ -12,7 +12,19 @@
 /* exported EditElevatorCursor */
 var EditElevatorCursor = (function() {
 
-	var _cursor_data = null; // data for the edit elevator cursor
+	var _x = null;        // Map x coordinate of cursor
+	var _floor = null;    // Map floor of cursor
+
+	var _room_def = null; // room def of elevator - for convince
+
+	var _elevator = null;  // Room elevator to edit
+	var _edit_end = null;  //'top' or 'bottom'
+	var _can_build = null; // True if cursor action can execute at current location
+
+	var _dom = { // DOM elements of the cursor. Note: these are actually jQuery objcets.
+		cursor: null, // wrapper element
+		a: null,      // link <a>
+	};
 
 	/**
 	 * App startup initialization of cursor.
@@ -21,28 +33,20 @@ var EditElevatorCursor = (function() {
 	 * width and other data specific to each room type.
 	 */
 	var init = function() {
-		_cursor_data = {};
 
 		var cursor = $('#gui-edit-elevator-cursor');
 		assert(cursor.length !== 0);
 		var a = cursor.find('a');
 
-		_cursor_data = {
-			/* Map position of cursor */
-			x: 0,
-			floor: 0,
-
-			room_def: null, // room def of elevator - for convince
-
-			elevator: null, // Room elevator to edit
-			edit_end: null,  //'top' or 'bottom'
-			can_build: false, // True if cursor action can execute at current location
-
-			dom: { // DOM elements of the cursor. Note: these are actually jQuery objcets.
-				cursor: cursor, // wrapper element
-				a: a,           // link <a>
-			},
-		};
+		/* Initialize cursor data. */
+		_x = 0;
+		_floor = 0;
+		_room_def = null;
+		_elevator = null;
+		_edit_end = null;
+		_can_build = false;
+		_dom.cursor = cursor;
+		_dom.a = a;
 
 		/*
 		 * Arrow keys do not fire keypress on all browsers. So use 'keydown' event rather than 'keypress'
@@ -129,8 +133,8 @@ var EditElevatorCursor = (function() {
 	 */
 	var _cursorClick = function() {
 		// Stop cursor
-		_cursor_data.elevator = null;
-		_cursor_data.edit_end = null;
+		_elevator = null;
+		_edit_end = null;
 		Gui.switchOverlay(Gui.OVERLAY_NAV);
 	};
 
@@ -139,7 +143,7 @@ var EditElevatorCursor = (function() {
 	 * @param d_floor delta floor
 	 */
 	var _moveCursor = function(d_floor) {
-		_setCursorPosition(_cursor_data.floor + d_floor);
+		_setCursorPosition(_floor + d_floor);
 	};
 
 	/**
@@ -149,7 +153,7 @@ var EditElevatorCursor = (function() {
 	 * @param floor the map floor coordinate
 	 */
 	var _setCursorPosition = function(floor) {
-		var x = _cursor_data.elevator.x;
+		var x = _elevator.x;
 		var screen_pos = MapToScreen(x, floor);
 
 		// Clamp position to be within screen
@@ -157,7 +161,7 @@ var EditElevatorCursor = (function() {
 			x++;
 			screen_pos = MapToScreen(x, floor);
 		}
-		while (screen_pos[0] + _cursor_data.room_def.width * 16 > g_canvas.width) {
+		while (screen_pos[0] + _room_def.width * 16 > g_canvas.width) {
 			x--;
 			screen_pos = MapToScreen(x, floor);
 		}
@@ -170,9 +174,9 @@ var EditElevatorCursor = (function() {
 			screen_pos = MapToScreen(x, floor);
 		}
 
-		if (x !== _cursor_data.x || floor !== _cursor_data.floor) {
-			_cursor_data.x = x;
-			_cursor_data.floor = floor;
+		if (x !== _x || floor !== _floor) {
+			_x = x;
+			_floor = floor;
 
 			_editElevator();
 			_updateCanBuildStatus();
@@ -180,7 +184,7 @@ var EditElevatorCursor = (function() {
 
 		// We don't know the old screen location as view might have shifted since last position update.
 		(function(){
-			var cursor = _cursor_data.dom.cursor;
+			var cursor = _dom.cursor;
 			cursor.css('left', screen_pos[0]);
 			cursor.css('top', screen_pos[1]);
 		})();
@@ -192,7 +196,7 @@ var EditElevatorCursor = (function() {
 	 */
 	var updateScreenPosition = function() {
 		if (_isVisible()) {
-			_setCursorPosition(_cursor_data.floor);
+			_setCursorPosition(_floor);
 		}
 	};
 
@@ -200,29 +204,29 @@ var EditElevatorCursor = (function() {
 	 * Check if cursor is visible
 	 */
 	var _isVisible = function() {
-		return !_cursor_data.dom.cursor.parent().hasClass('hidden');
+		return !_dom.cursor.parent().hasClass('hidden');
 	};
 
 	/**
 	 * Edit elevator top/down to match the floor of cursor
 	 */
 	var _editElevator = function() {
-		var new_floor = _cursor_data.floor;
-		var elevator = _cursor_data.elevator;
+		var new_floor = _floor;
+		var elevator = _elevator;
 
 		// Ensure that the elevator will have at least one non top/bottom piece after the edit
 		// + will not violate floor range restriction
-		if (_cursor_data.edit_end === 'top') {
+		if (_edit_end === 'top') {
 			new_floor = Math.max(new_floor, elevator.min_floor + 2);
-			new_floor = Math.min(new_floor, elevator.min_floor + _cursor_data.room_def.elevator_max_floor_range + 1);
+			new_floor = Math.min(new_floor, elevator.min_floor + _room_def.elevator_max_floor_range + 1);
 		} else {
 			new_floor = Math.min(new_floor, elevator.max_floor - 2);
-			new_floor = Math.max(new_floor, elevator.max_floor - _cursor_data.room_def.elevator_max_floor_range - 1);
+			new_floor = Math.max(new_floor, elevator.max_floor - _room_def.elevator_max_floor_range - 1);
 		}
 
-		if(new_floor !== (_cursor_data.edit_end === 'top' ? elevator.max_floor : elevator.min_floor)) {
+		if(new_floor !== (_edit_end === 'top' ? elevator.max_floor : elevator.min_floor)) {
 			// Edit if new_floor is different
-			if (Building.editElevatorEnd(elevator, _cursor_data.edit_end, new_floor)) {
+			if (Building.editElevatorEnd(elevator, _edit_end, new_floor)) {
 				PlaySoundEffect('build');
 			}
 		}
@@ -232,21 +236,21 @@ var EditElevatorCursor = (function() {
 	 * Updates build cursor regarding if room can be built at current position.
 	 */
 	var _updateCanBuildStatus = function() {
-		var cursor_floor = _cursor_data.floor;
-		var elevator = _cursor_data.elevator;
+		var cursor_floor = _floor;
+		var elevator = _elevator;
 
-		_cursor_data.can_build = Building.editElevatorEnd(elevator, _cursor_data.edit_end, cursor_floor);
+		_can_build = Building.editElevatorEnd(elevator, _edit_end, cursor_floor);
 
-		var cursor = _cursor_data.dom.cursor;
-		var a = _cursor_data.dom.a;
-		if (_cursor_data.can_build) {
+		var cursor = _dom.cursor;
+		var a = _dom.a;
+		if (_can_build) {
 			cursor.addClass('can-build');
 			cursor.removeClass('cannot-build');
-			a.attr('title', _cursor_data.room_def.name + ' ' + _cursor_data.edit_end + ', at floor: ' + cursor_floor);
+			a.attr('title', _room_def.name + ' ' + _edit_end + ', at floor: ' + cursor_floor);
 		} else {
 			cursor.removeClass('can-build');
 			cursor.addClass('cannot-build');
-			a.attr('title', 'Cannot adjust ' + _cursor_data.room_def.name + ' ' + _cursor_data.edit_end + ' to floor ' + cursor_floor);
+			a.attr('title', 'Cannot adjust ' + _room_def.name + ' ' + _edit_end + ' to floor ' + cursor_floor);
 		}
 	};
 
@@ -254,7 +258,7 @@ var EditElevatorCursor = (function() {
 	 * Get the edited elevator piece
 	 */
 	var _getPiece = function() {
-		return Building.getStairLayerRoomAt(_cursor_data.elevator.x,  _cursor_data.edit_end === 'top' ? _cursor_data.elevator.max_floor : _cursor_data.elevator.min_floor);
+		return Building.getStairLayerRoomAt(_elevator.x,  _edit_end === 'top' ? _elevator.max_floor : _elevator.min_floor);
 	};
 
 	/**
@@ -265,21 +269,21 @@ var EditElevatorCursor = (function() {
 	var _setElevatorToEdit = function(elevator, editEnd) {
 		assert(['top','bottom'].indexOf(editEnd) !== -1);
 
-		_cursor_data.elevator = elevator;
-		_cursor_data.edit_end = editEnd;
+		_elevator = elevator;
+		_edit_end = editEnd;
 		var piece = _getPiece();
-		_cursor_data.room_def = piece.def;
-		assert(RoomType.isElevator(_cursor_data.room_def.id));
+		_room_def = piece.def;
+		assert(RoomType.isElevator(_room_def.id));
 
-		var cursor = _cursor_data.dom.cursor;
-		var a = _cursor_data.dom.a;
+		var cursor = _dom.cursor;
+		var a = _dom.a;
 
 		// move cursor to elevator piece
-		_cursor_data.x = piece.x;
-		_cursor_data.floor = piece.floor;
+		_x = piece.x;
+		_floor = piece.floor;
 
 		a.css('width',  (piece.def.width * 16) + 'px');
-		var screen_pos = MapToScreen(_cursor_data.x, _cursor_data.floor);
+		var screen_pos = MapToScreen(_x, _floor);
 		cursor.css('left', screen_pos[0]);
 		cursor.css('top', screen_pos[1]);
 
@@ -300,8 +304,8 @@ var EditElevatorCursor = (function() {
 	 * Stop edit elevator cursor and return to nav overlay
 	 */
 	var stop = function() {
-		_cursor_data.elevator = null;
-		_cursor_data.edit_end = null;
+		_elevator = null;
+		_edit_end = null;
 		Gui.switchOverlay(Gui.OVERLAY_NAV);
 	};
 
