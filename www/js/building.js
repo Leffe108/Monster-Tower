@@ -334,7 +334,7 @@ var Building = (function() {
 						if (elevator.max_floor - elevator.min_floor + 1 < 3) {
 							error('Elvator error at [x: ' + floor_data[i].x + ', floor: ' + floor + ']: violating min floor range of 3 floors including top/bottom piece');
 						}
-						if (elevator.max_floor - elevator.min_floor + 1 > floor_data[i].def.elevator_max_floor_range) {
+						if (elevator.max_floor - elevator.min_floor + 1 > floor_data[i].def.elevator_max_floor_range + 2) {
 							error('Elvator error at [x: ' + floor_data[i].x + ', floor: ' + floor + ']: violating elevator max floor range of ' + floor_data[i].def.elevator_max_floor_range + ' floors');
 						}
 
