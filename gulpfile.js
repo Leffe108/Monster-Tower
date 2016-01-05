@@ -5,6 +5,7 @@ var concat = require('gulp-concat');
 var uglify = require('gulp-uglify');
 var rename = require('gulp-rename');
 var eslint = require('gulp-eslint');
+var sourcemaps = require('gulp-sourcemaps');
 
 /**
  * Runs a web server
@@ -50,21 +51,22 @@ gulp.task('webserver', function() {
 });
 
 // re-builds bundle and then cause browser to reload.
-gulp.task('on_js_change', ['lint_js', 'bundle_js', 'minify_js'], function() {
+gulp.task('on_js_change', ['lint_js', 'bundle_js'], function() {
 	browserSync.reload(); // reload full page.
 });
 
+// Bundles, minifies JS and produce source maps.
 gulp.task('bundle_js', function() {
 	return gulp.src(['www/js/!(main)*.js', 'www/js/main.js', '!www/js/bundle.js', '!www/js/bundle.min.js'])
+		.pipe(sourcemaps.init())
+		// bundle:
 		.pipe(concat('bundle.js'))
-		.pipe(gulp.dest('./www/js/'));
-});
-
-gulp.task('minify_js', ['bundle_js'], function() {
-	return gulp.src(['www/js/bundle.js'])
+		.pipe(gulp.dest('./www/js/'))
+		// minify:
 		.pipe(uglify({
 			compress: false,
 		}))
+		.pipe(sourcemaps.write())
 		.pipe(rename({extname: '.min.js'}))
 		.pipe(gulp.dest('./www/js/'));
 });
@@ -80,4 +82,4 @@ gulp.task('watch', function() {
 	gulp.watch(['www/js/*.js', '!www/js/bundle.js', '!www/js/bundle.min.js'], ['bundle_js']);
 });
 
-gulp.task('default', ['bundle_js', 'minify_js', 'webserver', 'watch']);
+gulp.task('default', ['bundle_js', 'webserver', 'watch']);
