@@ -889,11 +889,19 @@ var Gui = (function() {
 
 					case 'load_json_game':
 						var json_str = $(w.dom_node).find('textarea').val();
-						var loaded = SaveLoad.loadGameStateFromJsonStr(json_str);
-						if (loaded) {
+						var load_result = SaveLoad.loadGameStateFromJsonStr(json_str);
+						if (load_result.loaded) {
 							closeTopWindow();
+							if (load_result.message !== '') {
+								showWindow(getMessageWindow('Notice', load_result.message.trim().split('\n')));
+							}
 						} else {
-							showWindow(getMessageWindow('Load failed', ['Loading the game data failed. :-(']));
+							var rows = [];
+							if (load_result.message !== '') {
+								Array.prototype.push.apply(rows, load_result.message.trim().split('\n'));
+							}
+							rows.push('Loading the game data failed. :-(');
+							showWindow(getMessageWindow('Load failed', rows));
 							g_dirty_screen = true;
 						}
 						rebuildToolbars();

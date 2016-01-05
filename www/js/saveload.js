@@ -26,14 +26,19 @@ var SaveLoad = (function() {
 
 	/**
 	 * Load game state from provided JSON string
+	 * @return {
+	 *    loaded: true/false
+	 *    message: '' or string with complementary message
+	 * }
 	 */
 	var loadGameStateFromJsonStr = function(json_str) {
+		var message = '';
 		// Parse JSON str to object
 		try {
 			var obj = JSON.parse(json_str);
-			if (obj === null) return false;
+			if (obj === null) return {loaded: false, message: message};
 		} catch (e) {
-			return false;
+			return {loaded: false, message: message};
 		}
 
 		// Load data
@@ -47,7 +52,9 @@ var SaveLoad = (function() {
 			g_bank_balance = obj.bank_balance;
 			g_room_floors = _loadRoomFloorsFromJsonObj(obj.room_floors);
 			g_stair_floors = _loadRoomFloorsFromJsonObj(obj.stair_floors);
-			_removeOldElevators();
+			if (_removeOldElevators()) {
+				message += 'Old elevators have been removed. You need to rebuild them yourself with the new resizable elevators.\n';
+			}
 			_linkElevators();
 
 			// Validation
@@ -61,15 +68,15 @@ var SaveLoad = (function() {
 			valid &= Building.validateElevators();
 			if (!valid) {
 				InitGameState();
-				return false;
+				return {loaded: false, message: message};
 			}
 
 			Building.rebuildReachableFloors();
 
-			return true;
+			return {loaded: true, message: message};
 		} catch(e) {
 			InitGameState();
-			return false;
+			return {loaded: false, message: message};
 		}
 	};
 
@@ -125,6 +132,7 @@ var SaveLoad = (function() {
 
 	/**
 	 * Removes elevators with the old format (no .elevator nor .pieceName)
+	 * @return true if any elevator pieces were removed, otherwise false.
 	 */
 	var _removeOldElevators = function() {
 		var removed_elevator = false;
