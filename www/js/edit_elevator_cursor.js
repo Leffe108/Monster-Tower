@@ -53,12 +53,6 @@ var EditElevatorCursor = (function() {
 		 * as not everyone feel at home with hjkl.
 		 */
 		a.on('keydown', function(e) {
-			if (e.which === 13) {
-				this.click();
-				e.preventDefault();
-				return;
-			}
-
 			var d_floor = 0;
 			switch (e.which) {
 				case 13: // Enter/return
