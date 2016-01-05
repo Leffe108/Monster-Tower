@@ -17,12 +17,12 @@
 }
 
 /* --- GUI --- */
-#gui-window-overlay, #gui-nav-overlay, #gui-build-new-overlay, #gui-game-over-overlay {
+#gui-window-overlay, #gui-nav-overlay, #gui-build-new-overlay, #gui-edit-elevator-overlay, #gui-game-over-overlay {
 	position: absolute;
 	top: 0;
 	left: 0;
 }
-#gui-nav-overlay, #gui-build-new-overlay, #gui-game-over-overlay {
+#gui-nav-overlay, #gui-build-new-overlay, #gui-edit-elevator-overlay, #gui-game-over-overlay {
 	z-index: 2;
 }
 #gui-nav-overlay [data-nav-type="stair"] {
@@ -34,7 +34,8 @@
 
 /* Nav overlay */
 #gui-nav-overlay ul, #gui-nav-overlay li,
-#gui-build-new-overlay ul, #gui-build-new-overlay li {
+#gui-build-new-overlay ul, #gui-build-new-overlay li,
+#gui-edit-elevator-overlay ul, #gui-edit-elevator-overlay li {
 	list-style-type: none;
 }
 .gui-overlay-item {
@@ -55,15 +56,18 @@
 	background-color: rgba(0, 0, 255, 0.3);
 }
 
-#gui-build-new-cursor a {
+#gui-build-new-cursor a,
+#gui-edit-elevator-cursor a {
 	background-color: rgba(0, 0, 0, 0.2);
 	border: 1px dashed #333;
 }
-#gui-build-new-cursor.can-build a:focus {
+#gui-build-new-cursor.can-build a:focus,
+#gui-edit-elevator-cursor.can-build a:focus {
 	border: 1px solid blue !important;
 	background-color: rgba(0, 0, 255, 0.3);
 }
-#gui-build-new-cursor.cannot-build a:focus {
+#gui-build-new-cursor.cannot-build a:focus,
+#gui-edit-elevator-cursor.cannot-build a:focus {
 	border: 1px solid red !important;
 	background-color: rgba(255, 0, 0, 0.5) !important;
 }

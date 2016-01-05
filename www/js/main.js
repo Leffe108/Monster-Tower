@@ -2,7 +2,7 @@
  * Main
  */
 
-/* global Animation, Building, GameLevel, Gui, Money, BuildNewCursor, MtImage, Room, RoomType */
+/* global Animation, Building, GameLevel, Gui, Money, BuildNewCursor, EditElevatorCursor, MtImage, Room, RoomType */
 /* global assert, DrawRect */
 /* exported g_game_win_lose, g_game_star_level, g_reachable_floors, g_floor_stair_distance, g_room_types */
 /* exported INITIAL_BUILDING */
@@ -67,6 +67,7 @@ function InitCanvas() {
 		Gui.positionWindows();
 		Gui.rebuildToolbars();
 		BuildNewCursor.updateScreenPosition();
+		EditElevatorCursor.updateScreenPosition();
 		Gui.rebuildNavOverlay();
 	};
 }
@@ -312,12 +313,26 @@ function Render() {
 			floor_data = g_stair_floors[floor_num];
 
 			for (i = 0; i < floor_data.length; i++) {
-				var elevator = floor_data[i];
-				if (!RoomType.isElevator(elevator.def.id)) continue;
-				screen_pos = MapToScreen(elevator.x, floor_num);
+				var room_data = floor_data[i];
+				if (!RoomType.isElevator(room_data.def.id)) continue;
+				screen_pos = MapToScreen(room_data.x, floor_num);
 
-				add = '';
-				MtImage.draw(elevator.def.image + add, screen_pos[0], screen_pos[1]);
+				if (room_data.pieceName === null) {
+					add = '';
+				} else {
+					add = '-' + room_data.pieceName;
+				}
+				MtImage.draw(room_data.def.image + add, screen_pos[0], screen_pos[1]);
+
+				if (room_data.pieceName === null) {
+					var x_fiddle = -6;
+					var y_fiddle = 8;
+					g_context.fillStyle = "rgb(145, 195, 145)";
+					g_context.font = "12px Verdana";
+					g_context.textAlign = "center";
+					g_context.textBaseline = "middle";
+					g_context.fillText('' + floor_num, screen_pos[0] + room_data.def.width * 16 / 2 + x_fiddle, screen_pos[1] + 32/2 + y_fiddle);
+				}
 			}
 		}
 	}
@@ -372,6 +387,7 @@ function Init() {
 	InitGameState();
 	Animation.init();
 	BuildNewCursor.init();
+	EditElevatorCursor.init();
 	Gui.init();
 	MtImage.loadRoomTypeImages();
 

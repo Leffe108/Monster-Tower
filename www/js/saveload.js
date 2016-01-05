@@ -2,7 +2,7 @@
  * Save/load
  */
 
-/* global Building, GameLevel, Room */
+/* global Building, GameLevel, Room, RoomType */
 /* global g_simulation_time:true, g_simulation_day:true, g_game_win_lose:true, g_game_star_level:true, g_stair_floors:true, g_bank_balance:true, g_room_floors:true, g_stair_floors:true, g_room_types */
 /* global InitGameState */
 
@@ -47,6 +47,8 @@ var SaveLoad = (function() {
 			g_bank_balance = obj.bank_balance;
 			g_room_floors = _loadRoomFloorsFromJsonObj(obj.room_floors);
 			g_stair_floors = _loadRoomFloorsFromJsonObj(obj.stair_floors);
+			_removeOldElevators();
+			_linkElevators();
 
 			// Validation
 			var valid = true;
@@ -56,6 +58,7 @@ var SaveLoad = (function() {
 			valid &= typeof g_bank_balance === 'number';
 			valid &= g_room_floors !== false;
 			valid &= g_stair_floors !== false;
+			valid &= Building.validateElevators();
 			if (!valid) {
 				InitGameState();
 				return false;
@@ -86,6 +89,9 @@ var SaveLoad = (function() {
 				var room_copy = JSON.parse(JSON.stringify(room));
 				room_copy.def = room.def.id;
 				room_copy.overlay_item = null; // Don't save the overlay item
+				if (RoomType.isElevator(room.def.id) && room.pieceName !== 'top') {
+					room_copy.elevator = null; // Only save one copy of the elevator data - in the top piece.
+				}
 				result[floor].push(room_copy);
 			}
 		}
@@ -116,6 +122,59 @@ var SaveLoad = (function() {
 
 		return floor_container;
 	};
+
+	/**
+	 * Removes elevators with the old format (no .elevator nor .pieceName)
+	 */
+	var _removeOldElevators = function() {
+		var removed_elevator = false;
+		for (var floor = Building.MIN_FLOOR; floor <= Building.MAX_FLOOR; floor++) {
+			if (!(floor in g_stair_floors)) continue;
+
+			var floor_data = g_stair_floors[floor];
+			for (var i = 0; i < floor_data.length; i++) {
+				if (RoomType.isElevator(floor_data[i].def.id)) {
+					if (typeof floor_data[i].pieceName === 'undefined' ||
+							typeof floor_data[i].elevator === 'undefined') {
+						// Old elevator without .elevator and top/bottom pieces found.
+
+						// For now delete them. Later maybe revisit and add converter.
+						floor_data.splice(i, 1);
+						i--;
+						removed_elevator = true;
+					}
+				}
+			}
+		}
+		return removed_elevator;
+	};
+
+	/**
+	 * Set up the .elevator pointer for all elevator pieces.
+	 * @pre top pieces has .elevator data with correct min/max floor data.
+	 */
+	var _linkElevators = function() {
+
+		// Start from top, so the first elevator piece we find is the top part which is
+		// where the elevator data is stored in the save.
+		for (var floor = Building.MAX_FLOOR; floor >= Building.MIN_FLOOR; floor--) {
+			if (!(floor in g_stair_floors)) continue;
+
+			var floor_data = g_stair_floors[floor];
+			for (var i = 0; i < floor_data.length; i++) {
+				if (RoomType.isElevator(floor_data[i].def.id)) {
+					// Found elevator top - propagate .elevator to other parts
+					if (floor_data[i].pieceName === 'top') {
+						for (var el_floor = floor - 1; el_floor >= floor_data[i].elevator.min_floor; el_floor--) {
+							var el_part = Building.getStairLayerRoomAt(floor_data[i].x, el_floor);
+							el_part.elevator = floor_data[i].elevator;
+						}
+					}
+				}
+			}
+		}
+	};
+
 
 	// Export:
 	return {

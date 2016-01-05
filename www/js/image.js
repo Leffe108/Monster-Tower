@@ -54,6 +54,10 @@ var MtImage = (function() {
 			_loadImage(g_room_types[id].image, 0, 0);
 			if (RoomType.isStairLayerRoom(id)) {
 				_loadImage(g_room_types[id].image + '-build-icon', 0, 0);
+				if (id === 'elevator') {
+					_loadImage(g_room_types[id].image + '-top', 0, 0);
+					_loadImage(g_room_types[id].image + '-bottom', 0, 0);
+				}
 			} else {
 				_loadImage(g_room_types[id].image + '-closed', 0, 0);
 				if (id !== 'town-hall-room') _loadImage(g_room_types[id].image + '-for-rent', 0, 0);

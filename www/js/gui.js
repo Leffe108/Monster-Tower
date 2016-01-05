@@ -2,7 +2,7 @@
  * GUI related stuff
  */
 
-/* global Building, GameLevel, Money, Room, RoomType, SaveLoad, MtImage, BuildNewCursor */
+/* global Building, GameLevel, Money, Room, RoomType, SaveLoad, MtImage, BuildNewCursor, EditElevatorCursor */
 /* global g_bank_balance:true, g_canvas, g_dirty_screen:true, g_logo_timer:true, g_game_star_level, g_room_types, g_room_floors, g_stair_floors, g_view_offset_x:true, g_view_offset_floor:true, g_intro_aria_set:true */
 /* global EncodeEntities, InitGameState, MapToScreen, MoneyStr, StrFirstToUpper, DISABLE_LOGO_INTRO:true */
 /* exported g_dirty_screen, g_logo_timer, g_intro_aria_set, DISABLE_LOGO_INTRO */
@@ -13,8 +13,9 @@ var Gui = (function() {
 
 	var OVERLAY_NAV = 1;   // toolbar + click on rooms
 	var OVERLAY_BUILD_NEW = 2; // place new rooms
-	var OVERLAY_WINDOWS = 3;
-	var OVERLAY_GAME_OVER = 4;
+	var OVERLAY_EDIT_ELEVATOR = 3; // adjust elevator shaft bottom/top up/down
+	var OVERLAY_WINDOWS = 4;
+	var OVERLAY_GAME_OVER = 5;
 
 	var _open_windows = []; // list of open windows
 	var _toolbar_buildable_rooms = null; // array of rooms that can currently be built. The order affects toolbars
@@ -34,6 +35,7 @@ var Gui = (function() {
 	var switchOverlay = function(overlay) {
 		$('#gui-nav-overlay').addClass('hidden');
 		$('#gui-build-new-overlay').addClass('hidden');
+		$('#gui-edit-elevator-overlay').addClass('hidden');
 		$('#gui-window-overlay').addClass('hidden');
 		$('#gui-game-over-overlay').addClass('hidden');
 		if (overlay === OVERLAY_WINDOWS) {
@@ -45,6 +47,9 @@ var Gui = (function() {
 		} else if (overlay == OVERLAY_BUILD_NEW) {
 			$('#gui-build-new-overlay').removeClass('hidden');
 			$('#gui-build-new-cursor').find('a').focus();
+		} else if (overlay == OVERLAY_EDIT_ELEVATOR) {
+			$('#gui-edit-elevator-overlay').removeClass('hidden');
+			$('#gui-edit-elevator-cursor').find('a').focus();
 		} else if (overlay == OVERLAY_GAME_OVER) {
 			$('#gui-game-over-overlay').removeClass('hidden');
 			$('#gui-game-over-overlay a.play-again').focus();
@@ -104,6 +109,7 @@ var Gui = (function() {
 		// Remove old overlays
 		$('#gui-nav-overlay').find('ul[data-nav-type=toolbar]').find('li').remove();
 		$('#gui-build-new-overlay').find('ul[data-nav-type=toolbar]').find('li').remove();
+		$('#gui-edit-elevator-overlay').find('ul[data-nav-type=toolbar]').find('li').remove();
 
 		// Update _toolbar_buildable_rooms
 		var master_room_toolbar = ['stair', 'elevator', 'office', 'cafeteria', 'flower-shop', 'town-hall-room'];
@@ -168,28 +174,37 @@ var Gui = (function() {
 			x += g_room_types[room_type].width * 16;
 		}
 
-		// Toolbar in build-new mode/overlay
-		x = 0;
-		addOverlayItem({
-			id: 'abort_build_new',
-		}, 'Stop building more', x, 0, 32, 'build-new', 'toolbar');
-		x += 32;
-		addOverlayItem({
-			id: 'view_up',
-		}, 'Scroll view up', x, 0, 32, 'build-new', 'toolbar');
-		x += 32;
-		addOverlayItem({
-			id: 'view_down',
-		}, 'Scroll view down', x, 0, 32, 'build-new', 'toolbar');
-		x += 32;
-		addOverlayItem({
-			id: 'view_left',
-		}, 'Scroll view left', x, y, 32, 'build-new', 'toolbar');
-		x += 32;
-		addOverlayItem({
-			id: 'view_right',
-		}, 'Scroll view right', x, y, 32, 'build-new', 'toolbar');
-		x += 32;
+		// Toolbar in build-new/edit-elevator mode/overlay
+		['build-new', 'edit-elevator'].forEach(function(overlay) {
+			x = 0;
+			if (overlay === 'build-new') {
+				addOverlayItem({
+					id:  'abort_build_new',
+				}, 'Stop building more', x, 0, 32, overlay, 'toolbar');
+				x += 32;
+			} else {
+				addOverlayItem({
+					id:  'abort_edit_elevator',
+				}, 'Stop editing elevator shaft', x, 0, 32, overlay, 'toolbar');
+				x += 32;
+			}
+			addOverlayItem({
+				id: 'view_up',
+			}, 'Scroll view up', x, 0, 32, overlay, 'toolbar');
+			x += 32;
+			addOverlayItem({
+				id: 'view_down',
+			}, 'Scroll view down', x, 0, 32, overlay, 'toolbar');
+			x += 32;
+			addOverlayItem({
+				id: 'view_left',
+			}, 'Scroll view left', x, y, 32, overlay, 'toolbar');
+			x += 32;
+			addOverlayItem({
+				id: 'view_right',
+			}, 'Scroll view right', x, y, 32, overlay, 'toolbar');
+			x += 32;
+		});
 	};
 
 	var initGameOverOverlay = function() {
@@ -287,7 +302,7 @@ var Gui = (function() {
 				x += g_room_types[room_type].width * 16;
 			}
 
-		} else if (isBuildNewOverlayActive()) {
+		} else if (isBuildNewOverlayActive() || isEditElevatorOverlayActive()) {
 			MtImage.draw('build-complete', x, 0, 0);
 			x += 32;
 			MtImage.draw('view-up', x, 0, 0);
@@ -302,7 +317,12 @@ var Gui = (function() {
 	};
 
 	var roomClick = function(room_data) {
-		showWindow(getRoomWindow(room_data));
+		if (RoomType.isElevator(room_data.def.id) && room_data.pieceName !== null) {
+			// Clicked on top/bottom piece of elevator.
+			EditElevatorCursor.start(room_data.elevator, room_data.pieceName);
+		} else {
+			showWindow(getRoomWindow(room_data));
+		}
 	};
 
 	var toolbarClick = function(toolbar_button) {
@@ -335,21 +355,25 @@ var Gui = (function() {
 			case 'view_up':
 				g_view_offset_floor++;
 				BuildNewCursor.updateScreenPosition();
+				EditElevatorCursor.updateScreenPosition();
 				rebuildNavOverlay();
 				break;
 			case 'view_down':
 				g_view_offset_floor--;
 				BuildNewCursor.updateScreenPosition();
+				EditElevatorCursor.updateScreenPosition();
 				rebuildNavOverlay();
 				break;
 			case 'view_left':
 				g_view_offset_x+= 5;
 				BuildNewCursor.updateScreenPosition();
+				EditElevatorCursor.updateScreenPosition();
 				rebuildNavOverlay();
 				break;
 			case 'view_right':
 				g_view_offset_x-= 5;
 				BuildNewCursor.updateScreenPosition();
+				EditElevatorCursor.updateScreenPosition();
 				rebuildNavOverlay();
 				break;
 			case 'abort_build_new':
@@ -385,6 +409,9 @@ var Gui = (function() {
 	};
 	var isBuildNewOverlayActive = function() {
 		return !$('#gui-build-new-overlay').hasClass('hidden');
+	};
+	var isEditElevatorOverlayActive = function() {
+		return !$('#gui-edit-elevator-overlay').hasClass('hidden');
 	};
 
 	var hasOpenWindows = function() {
@@ -907,6 +934,7 @@ var Gui = (function() {
 		/* enum consts */
 		OVERLAY_NAV: OVERLAY_NAV,
 		OVERLAY_BUILD_NEW: OVERLAY_BUILD_NEW,
+		OVERLAY_EDIT_ELEVATOR: OVERLAY_EDIT_ELEVATOR,
 		OVERLAY_WINDOWS: OVERLAY_WINDOWS,
 		OVERLAY_GAME_OVER: OVERLAY_GAME_OVER,
 
@@ -917,6 +945,7 @@ var Gui = (function() {
 		addOverlayItem: addOverlayItem,
 		removeOverlayItem: removeOverlayItem,
 		rebuildToolbars: rebuildToolbars,
+		rebuildNavOverlay: rebuildNavOverlay,
 
 		isGameOverOverlayActive: isGameOverOverlayActive,
 		isBuildNewOverlayActive: isBuildNewOverlayActive,

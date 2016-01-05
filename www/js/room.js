@@ -4,7 +4,7 @@
  * Functions that work with room instances
  */
 
-/* global g_simulation_time, g_simulation_day, g_room_floors, g_stair_floors, g_reachable_floors */
+/* global RoomType, g_simulation_time, g_simulation_day, g_room_floors, g_stair_floors, g_reachable_floors */
 
 /* exported Room */
 var Room = (function() {
@@ -130,12 +130,16 @@ var Room = (function() {
 	 * @return true if room validates, otherwise false.
 	 */
 	var validate = function(room) {
-		// Currently only room.state is validated
-		return [
+		// room.state
+		return ([
 			ROOM_STATE_FOR_RENT,
 			ROOM_STATE_OPEN,
 			ROOM_STATE_CLOSED,
-		].indexOf(room.state) !== -1;
+		].indexOf(room.state) !== -1) &&
+		// Stair layer: must only use open state
+		(!RoomType.isStairLayerRoom(room.def.id) || (
+				room.state === ROOM_STATE_OPEN
+		));
 	};
 
 	// Export:

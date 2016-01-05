@@ -45,6 +45,7 @@ var RoomType = (function() {
 			maint_cost: 2000,
 			rent_income: 0,
 			min_stars: 2,
+			elevator_max_floor_range: 20, // Maximum number of floors to cover (excluding bottom/top piece)
 		};
 
 		g_room_types['cafeteria'] = {
