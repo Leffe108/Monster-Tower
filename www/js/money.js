@@ -2,7 +2,7 @@
  * Module: Money
  */
 
-/* global Animation, Room, g_bank_balance:true, g_simulation_time, g_room_floors, g_canvas */
+/* global Animation, Room, g_bank_balance:true, g_simulation_time, g_room_floors, g_stair_floors, g_canvas */
 
 /* exported Money */
 var Money = (function() {
@@ -17,14 +17,18 @@ var Money = (function() {
 			// New date
 
 			var balance_change = 0;
-			for(var floor_num in g_room_floors) {
-				var floor_data = g_room_floors[floor_num];
-				for (var i = 0; i < floor_data.length; i++) {
-					var room_data = floor_data[i];
+			var floor_containers = [g_room_floors, g_stair_floors];
+			for (var i_fc = 0; i_fc < floor_containers.length; i_fc++) {
+				var floor_container = floor_containers[i_fc];
+				for(var floor_num in floor_container) {
+					var floor_data = floor_container[floor_num];
+					for (var i = 0; i < floor_data.length; i++) {
+						var room_data = floor_data[i];
 
-					balance_change -= room_data.def.maint_cost;
-					if (room_data.state !== Room.ROOM_STATE_FOR_RENT) {
-						balance_change += room_data.def.rent_income;
+						balance_change -= room_data.def.maint_cost;
+						if (room_data.state !== Room.ROOM_STATE_FOR_RENT) {
+							balance_change += room_data.def.rent_income;
+						}
 					}
 				}
 			}
