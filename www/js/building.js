@@ -355,6 +355,8 @@ var Building = (function() {
 	var canBuildRoomHere = function(room_type, x, floor_num, pieceName) {
 		pieceName = pieceName || null;
 
+		if (floor_num > MAX_FLOOR || floor_num < MIN_FLOOR) return false;
+
 		// Stairs are different enough so they are handled separate
 		if (RoomType.isStairLayerRoom(room_type)) return _canBuildStairHere(room_type, x, floor_num, pieceName);
 
