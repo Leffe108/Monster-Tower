@@ -114,7 +114,7 @@ var BuildNewCursor = (function() {
 			_setRectMode(e.shiftKey, false);
 		});
 
-		a.on('mousedown', function(e) {
+		a.on('mousedown', function() {
 			_setRectMode(true, true);
 		});
 
@@ -317,7 +317,7 @@ var BuildNewCursor = (function() {
 				y_count: 1,
 			};
 		}
-	}
+	};
 
 	/**
 	 * Updates the DOM cursor top, left, width and height.
@@ -369,7 +369,6 @@ var BuildNewCursor = (function() {
 		for (var ix = 0; ix < rect.x_count; ix++) {
 			// When building rect start from the last click location.
 			var x = _rect_mode && _x < _rect_from_x ? max_build_x - ix * _room_def.width : rect.min_x + ix * _room_def.width;
-			console.log('x:' + x);
 			for (var floor = rect.min_floor; floor <= rect.max_floor; floor++) {
 				new_can_build = Building.canBuildRoomHere(_room_def.id, x, floor);
 				if (new_can_build) break;
