@@ -60,7 +60,15 @@ var MtImage = (function() {
 				}
 			} else {
 				_loadImage(g_room_types[id].image + '-closed', 0, 0);
-				if (id !== 'town-hall-room') _loadImage(g_room_types[id].image + '-for-rent', 0, 0);
+				if (g_room_types[id].rent_income !== 0) _loadImage(g_room_types[id].image + '-for-rent', 0, 0);
+				if (id === 'lobby') {
+					_loadImage(g_room_types[id].image + '-left', 0, 0);
+					_loadImage(g_room_types[id].image + '-right', 0, 0);
+					_loadImage(g_room_types[id].image + '-detail', 0, 0);
+					_loadImage(g_room_types[id].image + '-left-closed', 0, 0);
+					_loadImage(g_room_types[id].image + '-right-closed', 0, 0);
+					_loadImage(g_room_types[id].image + '-detail-closed', 0, 0);
+				}
 			}
 		}
 	};

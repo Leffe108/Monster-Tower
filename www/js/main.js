@@ -285,8 +285,11 @@ function Render() {
 				var screen_pos = MapToScreen(room.x, floor_num);
 
 				var add = '';
-				if (room.state === Room.ROOM_STATE_FOR_RENT) add = '-for-rent';
-				else if (room.state === Room.ROOM_STATE_CLOSED) add = '-closed';
+				if (room.pieceName !== null) {
+					add = '-' + room.pieceName;
+				}
+				if (room.state === Room.ROOM_STATE_FOR_RENT) add += '-for-rent';
+				else if (room.state === Room.ROOM_STATE_CLOSED) add += '-closed';
 				MtImage.draw(room.def.image + add, screen_pos[0], screen_pos[1]);
 			}
 		}

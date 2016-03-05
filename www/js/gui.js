@@ -113,7 +113,7 @@ var Gui = (function() {
 		$('#gui-edit-elevator-overlay').find('ul[data-nav-type=toolbar]').find('li').remove();
 
 		// Update _toolbar_buildable_rooms
-		var master_room_toolbar = ['stair', 'elevator', 'office', 'cafeteria', 'flower-shop', 'town-hall-room'];
+		var master_room_toolbar = ['lobby', 'stair', 'elevator', 'office', 'cafeteria', 'flower-shop', 'town-hall-room'];
 		_toolbar_buildable_rooms = [];
 		for (var i = 0; i < master_room_toolbar.length; i++) {
 			var room_def = g_room_types[master_room_toolbar[i]];

@@ -10,6 +10,18 @@ var RoomType = (function() {
 	var init = function() {
 
 		g_room_types = {};
+		g_room_types['lobby'] = {
+			id: 'lobby',
+			name: 'Lobby',
+			image: 'lobby',
+			width: 16/16,
+			buy_cost: 50,
+			demolish_cost: 0,
+			maint_cost: 10,
+			rent_income: 0,
+			min_stars: 0, // min number of stars before room is available
+		};
+
 		g_room_types['office'] = {
 			id: 'office',
 			name: 'Office',

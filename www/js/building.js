@@ -22,10 +22,14 @@ var Building = (function() {
 		rebuildReachableFloors(); // make floor 0 accessible
 
 		if (INITIAL_BUILDING) {
-			for (var floor = 0; floor < 3; floor++) {
+			for (var x = 18-4-1; x < 18+4+4+1; x++) {
+				buildRoom('lobby', 0, x);
+			}
+			for (var floor = 1; floor < 4; floor++) {
 				buildRoom('office', floor, 18);
 				buildRoom('office', floor, 18+4);
 				buildRoom('office', floor, 18-4);
+				buildRoom('stair', floor-1, 18);
 			}
 		}
 	};
@@ -72,6 +76,7 @@ var Building = (function() {
 			top_piece.elevator = elevator;
 		}
 		if (RoomType.isStairLayerRoom(room_type) && pieceName === null) rebuildReachableFloors();
+		if (room_type === 'lobby') _rebuildLobbyPieceInfo();
 
 		return room_instance;
 	};
@@ -110,6 +115,7 @@ var Building = (function() {
 		}
 
 		if (RoomType.isStairLayerRoom(room_instance.def.id)) rebuildReachableFloors();
+		if (room_instance.def.id === 'lobby') _rebuildLobbyPieceInfo();
 	};
 
 	/**
@@ -359,6 +365,11 @@ var Building = (function() {
 
 		// Stairs are different enough so they are handled separate
 		if (RoomType.isStairLayerRoom(room_type)) return _canBuildStairHere(room_type, x, floor_num, pieceName);
+
+		// Only lobby can be built on floor 0
+		if (room_type !== 'lobby' && floor_num === 0) return false;
+		// .. and lobby may not be built on other floors
+		if (room_type === 'lobby' && floor_num !== 0) return false;
 
 		// Town Hall Room can only be built once
 		if (room_type === 'town-hall-room' && Room.getCount(room_type) > 0) return false;
@@ -613,8 +624,8 @@ var Building = (function() {
 			pieceName: pieceName, // name of piece or null
 			elevator: null,    // pointer to elevator data or null
 		};
+		if (room_def.rent_income === 0) room_instance.state = Room.ROOM_STATE_CLOSED;
 		if (RoomType.isStairLayerRoom(room_def.id)) room_instance.state = Room.ROOM_STATE_OPEN;
-		if (room_def.id === 'town-hall-room') room_instance.state = Room.ROOM_STATE_CLOSED;
 
 		return room_instance;
 	};
@@ -710,6 +721,38 @@ var Building = (function() {
 		addOverlayItemForRoom(clone_instance);
 
 		return true;
+	};
+
+	/**
+	 * Rebuilds piece data for lobby room instances
+	 */
+	var _rebuildLobbyPieceInfo = function() {
+		var floor_data = _getFloorData(g_room_floors, 0, false);
+		if (floor_data === null) return;
+
+		for (var i = 0; i < floor_data.length; i++) {
+			var room = floor_data[i];
+			assert(room.def.id === 'lobby', 'assums floor 0 only has lobby');
+
+			room.pieceName = null;
+
+			// No lobby directly to the left?
+			if (i === 0 || floor_data[i-1].x + floor_data[i-1].width < floor_data[i].x) {
+				room.pieceName = 'left';
+				continue;
+			}
+			// No lobby directly to the right?
+			if (i === floor_data.length - 1 || floor_data[i].x + floor_data[i].width < floor_data[i+1].x) {
+				room.pieceName = 'right';
+				continue;
+			}
+
+			// Every now and then mix up with some detail
+			if (floor_data[i].x % 5 === 0) {
+				room.pieceName = 'detail';
+				continue;
+			}
+		}
 	};
 
 	// Export:

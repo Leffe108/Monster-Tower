@@ -40,8 +40,10 @@ var Room = (function() {
 					}
 
 					// Rent / for rent status
-					var rand = Math.random();
-					if (room_data.def.id !== 'town-hall-room') {
+					// Applies to rooms that can generate income when rented out. Rooms without
+					// income are regarded as facilities that never get ROOM_STATE_FOR_RENT.
+					if (room_data.def.rent_income !== 0) {
+						var rand = Math.random();
 						if (room_data.state === ROOM_STATE_FOR_RENT) {
 							if (floor_num in g_reachable_floors && // room must be reachable to be rented
 									rand > 0.8) {
@@ -63,6 +65,7 @@ var Room = (function() {
 					// open/close
 					if (room_data.state !== ROOM_STATE_FOR_RENT) {
 						var open_hours = {
+							'lobby': [5, 23],
 							'cafeteria': [11, 15],
 							'flower-shop': [14, 18],
 							'town-hall-room': [10, 17],
