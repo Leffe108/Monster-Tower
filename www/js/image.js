@@ -105,7 +105,9 @@ var MtImage = (function() {
 	var draw = function(image, x, y, angle) {
 		if (angle == null) angle = 0;
 		var img = _images[image];
-		if (img.complete && img.width > 0) { // .complete is always true in FF
+		if (img === null || img === undefined) {
+			console.log('Image ' + image + ' not loaded!')
+		} else if (img.complete && img.width > 0) { // .complete is always true in FF
 			g_context.save();
 			g_context.translate(Math.floor(x), Math.floor(y));
 			g_context.rotate(angle);
