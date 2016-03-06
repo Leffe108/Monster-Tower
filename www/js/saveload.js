@@ -55,6 +55,7 @@ var SaveLoad = (function() {
 			if (_removeOldElevators()) {
 				message += 'Old elevators have been removed. You need to rebuild them yourself with the new resizable elevators.\n';
 			}
+			_fixUndefiened();
 			_linkElevators();
 
 			// Validation
@@ -155,6 +156,26 @@ var SaveLoad = (function() {
 			}
 		}
 		return removed_elevator;
+	};
+
+	/**
+	 * undefined => null conversion
+	 */
+	var _fixUndefiened = function() {
+		var floor_containers = [g_room_floors, g_stair_floors];
+		for (var i_floor_container = 0; i_floor_container < 2; i_floor_container++) {
+			var floor_container = floor_containers[i_floor_container];
+			for (var floor_num = Building.MIN_FLOOR; floor_num <= Building.MAX_FLOOR; floor_num++) {
+				if (floor_num in floor_container) {
+					var floor_data = floor_container[floor_num];
+					for (var i = 0; i < floor_data.length; i++) {
+						var room = floor_data[i];
+
+						if (room.pieceName === undefined) room.pieceName = null;
+					}
+				}
+			}
+		}
 	};
 
 	/**
